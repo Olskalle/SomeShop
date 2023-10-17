@@ -6,7 +6,7 @@ namespace SomeShop.Models
 {
 	public class Manufacturer
 	{
-		[Required,
+		[Key,
 		DatabaseGenerated(DatabaseGeneratedOption.Identity)]
 		public int Id { get; set; }
 		[Required]

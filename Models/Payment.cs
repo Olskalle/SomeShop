@@ -6,13 +6,14 @@ namespace SomeShop.Models
 {
 	public class Payment
 	{
-		[Required,
+		[Key,
 		DatabaseGenerated(DatabaseGeneratedOption.Identity)]
 		public int Id { get; set; }
 		[Required]
 		public Order Order { get; set; } = null!;
 		[Required]
-		public Client Client { get; set; } = null!;
-		public List<OrderItem> OrderItems { get; set; } = null!;
+		public PaymentProvider Provider { get; set; } = null!;
+		[Required]
+		public PaymentStatus Status { get; set; } = null!;
 	}
 }

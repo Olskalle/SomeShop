@@ -5,21 +5,26 @@ namespace SomeShop.Models
 {
 	public class Order
 	{
-		[Required, 
+		[Key, 
 		DatabaseGenerated(DatabaseGeneratedOption.Identity)]
 		public int Id { get; set; }
+		[Required] 
+		public int ClientId { get; set; }
 		[Required]
-		public Client Client { get; set; } = null!;
+		public virtual Client Client { get; set; } = null!;
 		[Required]
 		public List<OrderItem> OrderItems { get; set; } = null!;
 		[Required]
 		public DateTime CreationDate { get; set; } = DateTime.UtcNow;
 		public DateTime ReceiveDate { get; set; }
 		[Required]
-		public virtual Shop Shop { get; set; } = null!;
+		public int Shopid { get; set; }
+		[Required]
+		public Shop Shop { get; set; } = null!;
+		public int EmployeeId { get; set; }
 		public virtual Employee? Employee { get; set; }
 		public virtual Payment? Payment { get; set; }
 		[Required]
-		public virtual OrderStatus Status { get; set; } = null!;
+		public OrderStatus Status { get; set; } = null!;
 	}
 }

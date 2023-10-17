@@ -7,11 +7,11 @@ namespace SomeShop.Models
 	{
 		[Required]
 		public int SessionId { get; set; }
-		[Required, ForeignKey("SessionId")]
+		[Required]
 		public virtual ShoppingSession ShoppingSession { get; set; } = null!;
 		[Required]
 		public int ProductId { get; set; }
-		[Required, ForeignKey("ProductId")]
+		[Required]
 		public virtual Product Product { get; set; } = null!;
 	}
 }

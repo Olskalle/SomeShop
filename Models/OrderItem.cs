@@ -7,9 +7,9 @@ namespace SomeShop.Models
 	public class OrderItem
 	{
 		[Required]
-		Order Order { get; set; } = null!;
+		public Order Order { get; set; } = null!;
 		[Required]
-		Product Product { get; set; } = null!;
-		int Quantity { get; set; } = 1;
+		public Product Product { get; set; } = null!;
+		public int Quantity { get; set; } = 1;
 	}
 }

@@ -6,11 +6,12 @@ namespace SomeShop.Models
 {
 	public class Employee
 	{
-		[Required,
+		[Key,
 		DatabaseGenerated(DatabaseGeneratedOption.Identity)]
 		public int Id { get; set; }
 		[Required]
 		public string Name { get; set; } = null!;
 		public string? PhoneNumber { get; set; }
+		public List<Order> Orders { get; set; } = new();
 	}
 }

@@ -12,6 +12,7 @@ namespace SomeShop.Models
 		[Required]
 		public string Name { get; set; } = null!;
 		public string? Description { get; set; }
+		[Required]
 		public List<Category> Categories { get; set; } = null!;
 		[Required]
 		public Manufacturer Manufacturer { get; set; } = null!;
