@@ -1,3 +1,5 @@
+using SomeShop.Services;
+
 namespace SomeShop
 {
 	public class Program
@@ -7,6 +9,8 @@ namespace SomeShop
 			var builder = WebApplication.CreateBuilder(args);
 
 			// Add services to the container.
+			builder.Services.AddDbContext<ShopContext>();
+			builder.Services.AddScoped<IShopService, ShopService>();
 
 			builder.Services.AddControllers();
 			// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

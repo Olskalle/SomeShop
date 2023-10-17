@@ -5,10 +5,9 @@ namespace SomeShop.Models
 {
 	public class ShoppingSession
 	{
-		[Required,
+		[Key,
 		DatabaseGenerated(DatabaseGeneratedOption.Identity)]
 		public int Id { get; set; }
-		[Required]
-		public List<CartItem> Products { get; set; } = null!;
+		[Required] public List<CartItem> Products { get; set; } = null!;
 	}
 }

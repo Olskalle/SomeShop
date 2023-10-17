@@ -9,8 +9,8 @@ namespace SomeShop.Models
 		[Key,
 		DatabaseGenerated(DatabaseGeneratedOption.Identity)]
 		public int Id { get; set; }
-		[Required]
-		public string Name { get; set; } = null!;
+		[Required] public string Name { get; set; } = null!;
+		[MinLength(11), MaxLength(11)]
 		public string? PhoneNumber { get; set; }
 	}
 }
