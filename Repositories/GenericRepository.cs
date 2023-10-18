@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 
 namespace SomeShop.Repositories
 {
@@ -51,6 +52,25 @@ namespace SomeShop.Repositories
 		{
 			entitySet.Update(entity); 
 			context.SaveChanges();
+		}
+		public IEnumerable<TEntity> GetWithInclude(params Expression<Func<TEntity, object>>[] includeExpressions)
+		{
+			return Include(includeExpressions).ToList();
+		}
+
+		public IEnumerable<TEntity> GetWithInclude(Func<TEntity, bool> predicate,
+			params Expression<Func<TEntity, object>>[] includeProperties)
+		{
+			var query = Include(includeProperties);
+			return query.Where(predicate).ToList();
+		}
+
+		private IQueryable<TEntity> Include(params Expression<Func<TEntity, object>>[] includeExpressions)
+		{
+			IQueryable<TEntity> query = entitySet.AsNoTracking();
+			return includeExpressions
+				.Aggregate(query, 
+					(current, includeProperty) => current.Include(includeProperty));
 		}
 	}
 }
