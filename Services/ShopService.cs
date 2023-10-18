@@ -1,9 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SomeShop.Models;
+using SomeShop.Services.Interfaces;
 
 namespace SomeShop.Services
 {
-	public class ShopService : IShopService
+    public class ShopService : IShopService
 	{
 		private readonly ShopContext _context;
 
@@ -11,21 +12,6 @@ namespace SomeShop.Services
         {
             _context = context;
         }
-
-		public IEnumerable<Category> GetAllCategories()
-		{
-			return _context.Categories.AsNoTracking().ToList();
-		}
-
-		public void Create(Category item)
-		{
-			try
-			{
-				_context.Categories.Add(item);
-				_context.SaveChanges();
-			}
-			catch { }
-		}
 		
 	}
 }

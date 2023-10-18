@@ -1,8 +1,9 @@
 using SomeShop.Services;
+using SomeShop.Services.Interfaces;
 
 namespace SomeShop
 {
-	public class Program
+    public class Program
 	{
 		public static void Main(string[] args)
 		{

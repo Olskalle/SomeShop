@@ -1,11 +1,11 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SomeShop.Models;
-using SomeShop.Services;
+using SomeShop.Services.Interfaces;
 
 namespace SomeShop.Controllers
 {
-	[Route("api/[controller]")]
+    [Route("api/[controller]")]
 	[ApiController]
 	public class ShopController : ControllerBase
 	{
