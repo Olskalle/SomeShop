@@ -10,7 +10,7 @@ namespace SomeShop.Models
 		DatabaseGenerated(DatabaseGeneratedOption.Identity)]
 		public int Id { get; set; }
 		[Required] public string Name { get; set; } = null!;
-		[MinLength(11), MaxLength(11)]
+		[MaxLength(32)]
 		public string? PhoneNumber { get; set; }
 		public List<Order> Orders { get; set; } = new();
 	}

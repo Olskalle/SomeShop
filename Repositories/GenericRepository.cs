@@ -5,10 +5,10 @@ namespace SomeShop.Repositories
 {
 	public class GenericRepository<TEntity> : IGenericRepository<TEntity> where TEntity : class
 	{
-		private DbContext context;
+		private IShopContext context;
 		private DbSet<TEntity> entitySet;
 
-        public GenericRepository(DbContext context)
+        public GenericRepository(IShopContext context)
         {
 			this.context = context;
 			entitySet = context.Set<TEntity>();

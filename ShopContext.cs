@@ -2,10 +2,11 @@
 using System.Data.Common;
 
 using SomeShop.Models;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SomeShop
 {
-	public class ShopContext : DbContext
+	public class ShopContext : DbContext, IShopContext
 	{
 		private readonly IConfiguration _configuration;
 		public ShopContext(IConfiguration configuration)

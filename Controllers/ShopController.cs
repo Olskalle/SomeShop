@@ -16,15 +16,15 @@ namespace SomeShop.Controllers
 			_service = service;
 		}
 
-		[HttpGet("categories")]
-		public IActionResult GetAllCategories()
+		[HttpGet("shops")]
+		public IActionResult GetAllShops()
 		{
-			return Ok(_service.GetAllCategories());
+			return Ok(_service.GetShops());
 		}
-		[HttpPost("categories/add")]
-		public IActionResult CreateCategory(Category category)
+		[HttpPost("shops/add")]
+		public IActionResult CreateCategory(Shop shop)
 		{
-			_service.Create(category);
+			_service.CreateShop(shop);
 			return Ok();
 		}
 	}
