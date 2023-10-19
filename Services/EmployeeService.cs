@@ -1,4 +1,5 @@
-﻿using SomeShop.Models;
+﻿using SomeShop.Exceptions;
+using SomeShop.Models;
 using SomeShop.Repositories;
 using SomeShop.Services.Interfaces;
 
@@ -13,40 +14,25 @@ namespace SomeShop.Services
 			_repository = repository;
         }
 
-        public void CreateEmployee(Employee item)
-		{
-			_repository.Create(item);
-		}
+		public void CreateEmployee(Employee item) => _repository.Create(item);
 
-		public void DeleteEmployee(Employee item)
-		{
-			_repository.Remove(item);
-		}
+		public void DeleteEmployee(Employee item) => _repository.Remove(item);
 
 		public Employee? GetEmployeeById(int id)
 		{
 			var result = _repository.Get(x => x.Id == id);
-			if (result.Count() > 1)
-			{
-				throw new InvalidOperationException($"Only one item expected, returned: {result.Count()}");
-			}
+
+			if (result is null) return null;
+
+			if (result.Count() > 1) throw new KeyNotUniqueException();
 
 			return result.FirstOrDefault();
 		}
 
-		public IEnumerable<Employee> GetEmployees()
-		{
-			return _repository.Get();
-		}
+		public IEnumerable<Employee> GetEmployees() => _repository.Get();
 
-		public IEnumerable<Employee> GetEmployees(Func<Employee, bool> predicate)
-		{
-			return _repository.Get(predicate);
-		}
+		public IEnumerable<Employee> GetEmployees(Func<Employee, bool> predicate) => _repository.Get(predicate);
 
-		public void UpdateEmployee(Employee item)
-		{
-			_repository.Update(item);
-		}
+		public void UpdateEmployee(Employee item) => _repository.Update(item);
 	}
 }

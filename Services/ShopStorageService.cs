@@ -13,39 +13,18 @@ namespace SomeShop.Services
             _repository = repository;
         }
 
-        public void CreateShopStorage(ShopStorage item)
-        {
-            _repository.Create(item);
-        }
+		public void CreateShopStorage(ShopStorage item) => _repository.Create(item);
 
-        public void DeleteShopStorage(ShopStorage item)
-        {
-            _repository.Remove(item);
-        }
+		public void DeleteShopStorage(ShopStorage item) => _repository.Remove(item);
 
-        public IEnumerable<ShopStorage> GetShopStorages()
-        {
-            return _repository.Get();
-        }
+		public IEnumerable<ShopStorage> GetShopStorages() => _repository.Get();
 
-        public IEnumerable<ShopStorage> GetShopStorages(Func<ShopStorage, bool> predicate)
-        {
-            return _repository.Get(predicate);
-        }
+		public IEnumerable<ShopStorage> GetShopStorages(Func<ShopStorage, bool> predicate) => _repository.Get(predicate);
 
-        public IEnumerable<ShopStorage> GetStorageByProductId(int id)
-        {
-            return _repository.Get(x => x.ProductId == id);
-        }
+        public IEnumerable<ShopStorage> GetStorageByProductId(int id) => _repository.Get(x => x.ProductId == id);
 
-        public IEnumerable<ShopStorage> GetStorageByShopId(int id)
-        {
-            return _repository.Get(x => x.ShopId == id);
-        }
+        public IEnumerable<ShopStorage> GetStorageByShopId(int id) => _repository.Get(x => x.ShopId == id);
 
-        public void UpdateShopStorage(ShopStorage item)
-        {
-            _repository.Update(item);
-        }
+        public void UpdateShopStorage(ShopStorage item) => _repository.Update(item);
     }
 }
