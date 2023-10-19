@@ -6,8 +6,8 @@ namespace SomeShop.Services.Interfaces
     {
         // Manage PaymentStatuses
         void CreatePaymentStatus(PaymentStatus item);
-        IEnumerable<PaymentStatus> GetPaymentStatuss();
-        IEnumerable<PaymentStatus> GetPaymentStatuss(Func<PaymentStatus, bool> predicate);
+        IEnumerable<PaymentStatus> GetPaymentStatuses();
+        IEnumerable<PaymentStatus> GetPaymentStatuses(Func<PaymentStatus, bool> predicate);
         PaymentStatus? GetPaymentStatusById(int id);
         void UpdatePaymentStatus(PaymentStatus item);
         void DeletePaymentStatus(PaymentStatus item);

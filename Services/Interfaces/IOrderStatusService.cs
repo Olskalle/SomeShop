@@ -8,7 +8,7 @@ namespace SomeShop.Services.Interfaces
         void CreateOrderStatus(OrderStatus item);
         IEnumerable<OrderStatus> GetOrderStatuses();
         IEnumerable<OrderStatus> GetOrderStatuses(Func<OrderStatus, bool> predicate);
-        OrderStatus? GetOrderStatusById(int id);
+        OrderStatus? GetStatusById(int id);
         void UpdateOrderStatus(OrderStatus item);
         void DeleteOrderStatus(OrderStatus item);
     }

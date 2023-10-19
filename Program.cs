@@ -1,3 +1,4 @@
+using SomeShop.Repositories;
 using SomeShop.Services;
 using SomeShop.Services.Interfaces;
 
@@ -10,7 +11,8 @@ namespace SomeShop
 			var builder = WebApplication.CreateBuilder(args);
 
 			// Add services to the container.
-			builder.Services.AddDbContext<ShopContext>();
+			builder.Services.AddScoped<IShopContext, ShopContext>();
+			builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 			builder.Services.AddScoped<IShopService, ShopService>();
 
 			builder.Services.AddControllers();

@@ -8,7 +8,7 @@ namespace SomeShop.Services.Interfaces
         void CreatePaymentProvider(PaymentProvider item);
         IEnumerable<PaymentProvider> GetPaymentProviders();
         IEnumerable<PaymentProvider> GetPaymentProviders(Func<PaymentProvider, bool> predicate);
-        PaymentProvider? GetPaymentProviderById(int id);
+        PaymentProvider? GetProviderById(int id);
         void UpdatePaymentProvider(PaymentProvider item);
         void DeletePaymentProvider(PaymentProvider item);
     }

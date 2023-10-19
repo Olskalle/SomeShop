@@ -20,5 +20,7 @@ namespace SomeShop
 		DbSet<ShoppingSession> ShoppingSessions { get; set; }
 		DbSet<Shop> Shops { get; set; }
 		DbSet<ShopStorage> ShopStorages { get; set; }
+		DbSet<T> Set<T>() where T : class;
+		int SaveChanges();
 	}
 }
