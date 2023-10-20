@@ -10,6 +10,7 @@ namespace SomeShop.Services.Interfaces
         IEnumerable<CartItem> GetCartItems(Func<CartItem, bool> predicate);
         IEnumerable<CartItem> GetItemsBySessionId(int sessionId);
         IEnumerable<CartItem> GetItemsByProductId(int productId);
+        CartItem? GetItemByKey(int sessionId, int productId);
         void UpdateCartItem(CartItem item);
         void DeleteCartItem(CartItem item);
     }

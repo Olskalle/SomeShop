@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 using SomeShop.Models;
 using SomeShop.Services.Interfaces;
 
@@ -16,7 +17,7 @@ namespace SomeShop.Controllers
 			_service = service;
 		}
 
-		[HttpGet]
+		[HttpGet("all")]
 		public IActionResult GetAllShops()
 		{
 			var result = _service.GetShops();
@@ -33,7 +34,7 @@ namespace SomeShop.Controllers
 		{
 			var result = _service.GetShopById(id);
 
-			if (result is null) return NoContent();
+			if (result is null) return NotFound();
 
 			return Ok(result);
 		}
@@ -43,6 +44,37 @@ namespace SomeShop.Controllers
 		{
 			_service.CreateShop(shop);
 			return Ok();
+		}
+
+		[HttpPut("update/{id}")]
+		public IActionResult UpdateShop(int id, Shop shop)
+		{
+
+			if (id != shop.Id) return BadRequest();
+
+			if (_service.GetShopById(id) != null)
+			{
+				_service.UpdateShop(shop);
+			}
+			else
+			{
+				_service.CreateShop(shop);
+			}
+
+			return Ok();
+		}
+
+		[HttpDelete("delete/{id}")]
+		public IActionResult DeleteShop(int id)
+		{
+			var shopToDelete = _service.GetShopById(id);
+			if (shopToDelete != null)
+			{
+				_service.DeleteShop(shopToDelete);
+				return Ok();
+			}
+
+			return NotFound();
 		}
 	}
 }

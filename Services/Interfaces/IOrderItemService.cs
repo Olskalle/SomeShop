@@ -8,7 +8,8 @@ namespace SomeShop.Services.Interfaces
         IEnumerable<OrderItem> GetOrderItems();
         IEnumerable<OrderItem> GetOrderItems(Func<OrderItem, bool> predicate);
         IEnumerable<OrderItem> GetItemsByOrderId(int id);
-        IEnumerable<OrderItem> GetOrderItemsByProductId(int id);
+        IEnumerable<OrderItem> GetItemsByProductId(int id);
+        OrderItem? GetItemByKey(int orderId, int productId);
         void UpdateOrderItem(OrderItem item);
         void DeleteOrderItem(OrderItem item);
     }
