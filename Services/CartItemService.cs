@@ -1,4 +1,5 @@
-﻿using SomeShop.Models;
+﻿using SomeShop.Exceptions;
+using SomeShop.Models;
 using SomeShop.Repositories;
 using SomeShop.Services.Interfaces;
 
@@ -17,6 +18,19 @@ namespace SomeShop.Services
 		public IEnumerable<CartItem> GetCartItems() => _repository.Get();
 
 		public IEnumerable<CartItem> GetCartItems(Func<CartItem, bool> predicate) => _repository.Get(predicate);
+
+		public CartItem? GetItemByKey(int sessionId, int productId)
+		{
+			var result =_repository
+				.Get(x => x.SessionId == sessionId 
+					&& x.ProductId == productId);
+
+			if (result is null) return null;
+
+			if (result.Count() > 1) throw new KeyNotUniqueException();
+
+			return result.FirstOrDefault();
+		}
 
 		public IEnumerable<CartItem> GetItemsByProductId(int id) => _repository.Get(x => x.ProductId == id);
 

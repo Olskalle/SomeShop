@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using SomeShop.Exceptions;
 using SomeShop.Models;
 using SomeShop.Repositories;
 using SomeShop.Services.Interfaces;
@@ -24,8 +25,19 @@ namespace SomeShop.Services
 
 		public IEnumerable<OrderItem> GetOrderItems(Func<OrderItem, bool> predicate) => _repository.Get(predicate);
 
-		public IEnumerable<OrderItem> GetOrderItemsByProductId(int id) => _repository.Get(x => x.ProductId == id);
+		public IEnumerable<OrderItem> GetItemsByProductId(int id) => _repository.Get(x => x.ProductId == id);
 
 		public void UpdateOrderItem(OrderItem item) => _repository.Update(item);
+
+		public OrderItem? GetItemByKey(int orderId, int productId)
+		{
+			var result = _repository.Get(x => x.OrderId == orderId && x.ProductId == productId);
+
+			if (result is null) return null;
+
+			if (result.Count() > 1) throw new KeyNotUniqueException();
+
+			return result.FirstOrDefault();
+		}
 	}
 }

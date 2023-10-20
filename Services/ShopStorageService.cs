@@ -1,4 +1,5 @@
-﻿using SomeShop.Models;
+﻿using SomeShop.Exceptions;
+using SomeShop.Models;
 using SomeShop.Repositories;
 using SomeShop.Services.Interfaces;
 
@@ -21,7 +22,18 @@ namespace SomeShop.Services
 
 		public IEnumerable<ShopStorage> GetShopStorages(Func<ShopStorage, bool> predicate) => _repository.Get(predicate);
 
-        public IEnumerable<ShopStorage> GetStorageByProductId(int id) => _repository.Get(x => x.ProductId == id);
+		public ShopStorage? GetStorageByKey(int shopId, int productId)
+		{
+			var result = _repository.Get(x => x.ShopId == shopId && x.ProductId == productId);
+
+			if (result is null) return null;
+
+			if (result.Count() > 1) throw new KeyNotUniqueException();
+
+			return result.FirstOrDefault();
+		}
+
+		public IEnumerable<ShopStorage> GetStorageByProductId(int id) => _repository.Get(x => x.ProductId == id);
 
         public IEnumerable<ShopStorage> GetStorageByShopId(int id) => _repository.Get(x => x.ShopId == id);
 

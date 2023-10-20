@@ -10,6 +10,7 @@ namespace SomeShop.Services.Interfaces
         IEnumerable<ShopStorage> GetShopStorages(Func<ShopStorage, bool> predicate);
         IEnumerable<ShopStorage> GetStorageByShopId(int id);
         IEnumerable<ShopStorage> GetStorageByProductId(int id);
+        ShopStorage? GetStorageByKey(int shopId, int productId);
         void UpdateShopStorage(ShopStorage item);
         void DeleteShopStorage(ShopStorage item);
     }
