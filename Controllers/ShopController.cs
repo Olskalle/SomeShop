@@ -16,13 +16,30 @@ namespace SomeShop.Controllers
 			_service = service;
 		}
 
-		[HttpGet("shops")]
+		[HttpGet]
 		public IActionResult GetAllShops()
 		{
-			return Ok(_service.GetShops());
+			var result = _service.GetShops();
+
+			if (result is null || result.Count() <= 0)
+			{
+				return NoContent();
+			}
+
+			return Ok(result);
 		}
-		[HttpPost("shops/add")]
-		public IActionResult CreateCategory(Shop shop)
+		[HttpGet("{id}")]
+		public IActionResult GetShop(int id)
+		{
+			var result = _service.GetShopById(id);
+
+			if (result is null) return NoContent();
+
+			return Ok(result);
+		}
+
+		[HttpPost("add")]
+		public IActionResult AddShop(Shop shop)
 		{
 			_service.CreateShop(shop);
 			return Ok();
