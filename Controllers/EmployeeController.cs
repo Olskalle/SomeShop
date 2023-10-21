@@ -39,17 +39,19 @@ namespace SomeShop.Controllers
         }
 
         [HttpPost("add")]
-        public IActionResult AddEmployee(Employee item)
+        public IActionResult AddEmployee(Employee? item)
         {
-            _service.CreateEmployee(item);
+			if (item is null) return BadRequest();
+
+			_service.CreateEmployee(item);
             return Ok();
         }
 
         [HttpPut("update/{id}")]
-        public IActionResult UpdateEmployee(int id, Employee item)
+        public IActionResult UpdateEmployee(int id, Employee? item)
         {
 
-            if (id != item.Id) return BadRequest();
+            if (item is null || id != item.Id) return BadRequest();
 
             if (_service.GetEmployeeById(id) != null)
             {

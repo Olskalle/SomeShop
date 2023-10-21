@@ -39,17 +39,19 @@ namespace SomeCategory.Controllers
 		}
 
 		[HttpPost("add")]
-		public IActionResult AddCategory(Category item)
+		public IActionResult AddCategory(Category? item)
 		{
+			if (item is null) return BadRequest();
+
 			_service.CreateCategory(item);
 			return Ok();
 		}
 
 		[HttpPut("update/{id}")]
-		public IActionResult UpdateCategory(int id, Category item)
+		public IActionResult UpdateCategory(int id, Category? item)
 		{
 
-			if (id != item.Id) return BadRequest();
+			if (item is null || id != item.Id) return BadRequest();
 
 			if (_service.GetCategoryById(id) != null)
 			{

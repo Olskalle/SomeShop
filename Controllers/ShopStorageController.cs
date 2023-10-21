@@ -59,17 +59,19 @@ namespace SomeShop.Controllers
 		}
 
 		[HttpPost("add")]
-		public IActionResult AddShopStorage(ShopStorage ShopStorage)
+		public IActionResult AddShopStorage(ShopStorage? item)
 		{
-			_service.CreateShopStorage(ShopStorage);
+			if (item is null) return BadRequest();
+
+			_service.CreateShopStorage(item);
 			return Ok();
 		}
 
 		[HttpPut("update/{orderId}&{productId}")]
-		public IActionResult UpdateShopStorage(int orderId, int productId, ShopStorage item)
+		public IActionResult UpdateShopStorage(int orderId, int productId, ShopStorage? item)
 		{
 
-			if (orderId != item.ShopId || productId != item.ProductId)
+			if (item is null || orderId != item.ShopId || productId != item.ProductId)
 			{
 				return BadRequest();
 			}

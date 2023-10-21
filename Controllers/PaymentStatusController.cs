@@ -39,17 +39,19 @@ namespace SomeShop.Controllers
 		}
 
 		[HttpPost("add")]
-		public IActionResult AddPaymentStatus(PaymentStatus item)
+		public IActionResult AddPaymentStatus(PaymentStatus? item)
 		{
+			if (item is null) return BadRequest();
+
 			_service.CreatePaymentStatus(item);
 			return Ok();
 		}
 
 		[HttpPut("update/{id}")]
-		public IActionResult UpdatePaymentStatus(int id, PaymentStatus item)
+		public IActionResult UpdatePaymentStatus(int id, PaymentStatus? item)
 		{
 
-			if (id != item.Id) return BadRequest();
+			if (item is null || id != item.Id) return BadRequest();
 
 			if (_service.GetPaymentStatusById(id) != null)
 			{

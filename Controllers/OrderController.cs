@@ -39,17 +39,19 @@ namespace SomeShop.Controllers
         }
 
         [HttpPost("add")]
-        public IActionResult AddOrder(Order item)
+        public IActionResult AddOrder(Order? item)
         {
-            _service.CreateOrder(item);
+			if (item is null) return BadRequest();
+
+			_service.CreateOrder(item);
             return Ok();
         }
 
         [HttpPut("update/{id}")]
-        public IActionResult UpdateOrder(int id, Order item)
+        public IActionResult UpdateOrder(int id, Order? item)
         {
 
-            if (id != item.Id) return BadRequest();
+            if (item is null || id != item.Id) return BadRequest();
 
             if (_service.GetOrderById(id) != null)
             {

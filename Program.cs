@@ -16,21 +16,21 @@ namespace SomeShop
 			builder.Services.AddScoped<IShopContext, ShopContext>();
 			builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 
-			builder.Services.AddScoped<IOrderItemService, OrderItemService>();
-			builder.Services.AddScoped<ICategoryService, CategoryService>();
-			builder.Services.AddScoped<IClientService, ClientService>();
-			builder.Services.AddScoped<IEmployeeService, EmployeeService>();
-			builder.Services.AddScoped<IManufacturerService, ManufacturerService>();
-			builder.Services.AddScoped<IOrderService, OrderService>();
-			builder.Services.AddScoped<IOrderItemService, OrderItemService>();
-			builder.Services.AddScoped<IOrderStatusService, OrderStatusService>();
-			builder.Services.AddScoped<IPaymentService, PaymentService>();
-			builder.Services.AddScoped<IPaymentProviderService, PaymentProviderService> ();
-			builder.Services.AddScoped<IPaymentStatusService, PaymentStatusService>();
-			builder.Services.AddScoped<IProductService, ProductService> ();
-			builder.Services.AddScoped<IShopService, ShopService>();
-			builder.Services.AddScoped<IShoppingSessionService, ShoppingSessionService>();
-			builder.Services.AddScoped<IShopStorageService, ShopStorageService>();
+			builder.Services.AddScoped<IOrderItemService, OrderItemService>()
+				.AddScoped<ICategoryService, CategoryService>()
+				.AddScoped<IClientService, ClientService>()
+				.AddScoped<IEmployeeService, EmployeeService>()
+				.AddScoped<IManufacturerService, ManufacturerService>()
+				.AddScoped<IOrderService, OrderService>()
+				.AddScoped<IOrderItemService, OrderItemService>()
+				.AddScoped<IOrderStatusService, OrderStatusService>()
+				.AddScoped<IPaymentService, PaymentService>()
+				.AddScoped<IPaymentProviderService, PaymentProviderService>()
+				.AddScoped<IPaymentStatusService, PaymentStatusService>()
+				.AddScoped<IProductService, ProductService>()
+				.AddScoped<IShopService, ShopService>()
+				.AddScoped<IShoppingSessionService, ShoppingSessionService>()
+				.AddScoped<IShopStorageService, ShopStorageService>();
 
 
 			builder.Services.AddControllers();

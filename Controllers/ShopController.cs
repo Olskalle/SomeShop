@@ -40,25 +40,27 @@ namespace SomeShop.Controllers
 		}
 
 		[HttpPost("add")]
-		public IActionResult AddShop(Shop shop)
+		public IActionResult AddShop(Shop? item)
 		{
-			_service.CreateShop(shop);
+			if (item is null) return BadRequest();
+
+			_service.CreateShop(item);
 			return Ok();
 		}
 
 		[HttpPut("update/{id}")]
-		public IActionResult UpdateShop(int id, Shop shop)
+		public IActionResult UpdateShop(int id, Shop? item)
 		{
 
-			if (id != shop.Id) return BadRequest();
+			if (id != item.Id) return BadRequest();
 
 			if (_service.GetShopById(id) != null)
 			{
-				_service.UpdateShop(shop);
+				_service.UpdateShop(item);
 			}
 			else
 			{
-				_service.CreateShop(shop);
+				_service.CreateShop(item);
 			}
 
 			return Ok();

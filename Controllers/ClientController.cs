@@ -39,17 +39,19 @@ namespace SomeShop.Controllers
         }
 
         [HttpPost("add")]
-        public IActionResult AddClient(Client item)
+        public IActionResult AddClient(Client? item)
         {
-            _service.CreateClient(item);
+			if (item is null) return BadRequest();
+
+			_service.CreateClient(item);
             return Ok();
         }
 
         [HttpPut("update/{id}")]
-        public IActionResult UpdateClient(int id, Client item)
+        public IActionResult UpdateClient(int id, Client? item)
         {
 
-            if (id != item.Id) return BadRequest();
+            if (item is null || id != item.Id) return BadRequest();
 
             if (_service.GetClientById(id) != null)
             {

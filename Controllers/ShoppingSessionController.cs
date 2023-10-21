@@ -39,17 +39,19 @@ namespace SomeShop.Controllers
 		}
 
 		[HttpPost("add")]
-		public IActionResult AddSession(ShoppingSession item)
+		public IActionResult AddSession(ShoppingSession? item)
 		{
+			if (item is null) return BadRequest();
+
 			_service.CreateShoppingSession(item);
 			return Ok();
 		}
 
 		[HttpPut("update/{id}")]
-		public IActionResult UpdateShoppingSession(int id, ShoppingSession item)
+		public IActionResult UpdateShoppingSession(int id, ShoppingSession? item)
 		{
 
-			if (id != item.Id) return BadRequest();
+			if (item is null || id != item.Id) return BadRequest();
 
 			if (_service.GetSessionById(id) != null)
 			{

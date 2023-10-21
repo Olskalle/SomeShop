@@ -60,17 +60,19 @@ namespace SomeShop.Controllers
 		}
 
 		[HttpPost("add")]
-		public IActionResult AddCartItem(CartItem CartItem)
+		public IActionResult AddCartItem(CartItem? item)
 		{
-			_service.CreateCartItem(CartItem);
+			if (item is null) return BadRequest();
+
+			_service.CreateCartItem(item);
 			return Ok();
 		}
 
 		[HttpPut("update/{sessionId}&{productId}")]
-		public IActionResult UpdateCartItem(int sessionId, int productId, CartItem item)
+		public IActionResult UpdateCartItem(int sessionId, int productId, CartItem? item)
 		{
 
-			if (sessionId != item.SessionId || productId != item.ProductId)
+			if (item is null || sessionId != item.SessionId || productId != item.ProductId)
 			{
 				return BadRequest();
 			}
@@ -84,13 +86,13 @@ namespace SomeShop.Controllers
 			return NotFound();
 		}
 
-		[HttpDelete("delete/{id}")]
+		[HttpDelete("delete/{sessionId}&{productId}")]
 		public IActionResult DeleteCartItem(int sessionId, int productId)
 		{
-			var CartItemToDelete = _service.GetItemByKey(sessionId, productId);
-			if (CartItemToDelete != null)
+			var cartItemToDelete = _service.GetItemByKey(sessionId, productId);
+			if (cartItemToDelete != null)
 			{
-				_service.DeleteCartItem(CartItemToDelete);
+				_service.DeleteCartItem(cartItemToDelete);
 				return Ok();
 			}
 

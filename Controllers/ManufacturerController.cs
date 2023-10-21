@@ -39,17 +39,19 @@ namespace SomeShop.Controllers
         }
 
         [HttpPost("add")]
-        public IActionResult AddManufacturer(Manufacturer item)
+        public IActionResult AddManufacturer(Manufacturer? item)
         {
-            _service.CreateManufacturer(item);
+			if (item is null) return BadRequest();
+
+			_service.CreateManufacturer(item);
             return Ok();
         }
 
         [HttpPut("update/{id}")]
-        public IActionResult UpdateManufacturer(int id, Manufacturer item)
+        public IActionResult UpdateManufacturer(int id, Manufacturer? item)
         {
 
-            if (id != item.Id) return BadRequest();
+            if (item is null || id != item.Id) return BadRequest();
 
             if (_service.GetManufacturerById(id) != null)
             {
