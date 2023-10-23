@@ -2,6 +2,7 @@
 using SomeShop.Models;
 using SomeShop.Repositories;
 using SomeShop.Services.Interfaces;
+using System.Linq.Expressions;
 
 namespace SomeShop.Services
 {
@@ -22,7 +23,7 @@ namespace SomeShop.Services
 		{
 			var result = _repository.Get(x => x.Id == id);
 
-			if (result is null) return null;
+			if (result is null) throw new NullReferenceException();
 
 			if (result.Count() > 1) throw new KeyNotUniqueException();
 
@@ -31,7 +32,7 @@ namespace SomeShop.Services
 
 		public IEnumerable<OrderStatus> GetOrderStatuses() => _repository.Get();
 
-		public IEnumerable<OrderStatus> GetOrderStatuses(Func<OrderStatus, bool> predicate) => _repository.Get(predicate);
+		public IEnumerable<OrderStatus> GetOrderStatuses(Expression<Func<OrderStatus, bool>> predicate) => _repository.Get(predicate);
 
 		public void UpdateOrderStatus(OrderStatus item) => _repository.Update(item);
 	}

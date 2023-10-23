@@ -1,4 +1,5 @@
 ﻿using SomeShop.Models;
+using System.Linq.Expressions;
 
 namespace SomeShop.Services.Interfaces
 {
@@ -7,7 +8,7 @@ namespace SomeShop.Services.Interfaces
         // Manage PaymentProviders
         void CreatePaymentProvider(PaymentProvider item);
         IEnumerable<PaymentProvider> GetPaymentProviders();
-        IEnumerable<PaymentProvider> GetPaymentProviders(Func<PaymentProvider, bool> predicate);
+        IEnumerable<PaymentProvider> GetPaymentProviders(Expression<Func<PaymentProvider, bool>> predicate);
         PaymentProvider? GetProviderById(int id);
         void UpdatePaymentProvider(PaymentProvider item);
         void DeletePaymentProvider(PaymentProvider item);
@@ -16,7 +17,7 @@ namespace SomeShop.Services.Interfaces
 /*
 void Create%EntityType%(%EntityType% item);
 IEnumerable<%EntityType%> Get%EntityType%s();
-IEnumerable<%EntityType%> Get%EntityType%s(Func<%EntityType%, bool> predicate);
+IEnumerable<%EntityType%> Get%EntityType%s(Expression<Func<%EntityType%, bool>> predicate);
 %EntityType%? Get%EntityType%ById(int id);
 void Update%EntityType%(%EntityType% item);
 void Delete%EntityType%(%EntityType% item);

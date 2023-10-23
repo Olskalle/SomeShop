@@ -3,8 +3,9 @@ using SomeShop.Exceptions;
 using SomeShop.Models;
 using SomeShop.Repositories;
 using SomeShop.Services.Interfaces;
+using System.Linq.Expressions;
 
-namespace SomeManufacturer.Services
+namespace SomeShop.Services
 {
     public class ManufacturerService : IManufacturerService
     {
@@ -23,7 +24,7 @@ namespace SomeManufacturer.Services
         {
             var result = _repository.Get(x => x.Id == id);
 
-			if (result is null) return null;
+			if (result is null) throw new NullReferenceException();
 
 			if (result.Count() > 1) throw new KeyNotUniqueException();
 
@@ -32,7 +33,7 @@ namespace SomeManufacturer.Services
 
 		public IEnumerable<Manufacturer> GetManufacturers() => _repository.Get();
 
-		public IEnumerable<Manufacturer> GetManufacturers(Func<Manufacturer, bool> predicate) => _repository.Get(predicate);
+		public IEnumerable<Manufacturer> GetManufacturers(Expression<Func<Manufacturer, bool>> predicate) => _repository.Get(predicate);
 
 		public void UpdateManufacturer(Manufacturer item) => _repository.Update(item);
 	}

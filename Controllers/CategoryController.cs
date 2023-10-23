@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using SomeShop.Models;
 using SomeShop.Services.Interfaces;
 
-namespace SomeCategory.Controllers
+namespace SomeShop.Controllers
 {
 	[Route("api/[controller]")]
 	[ApiController]

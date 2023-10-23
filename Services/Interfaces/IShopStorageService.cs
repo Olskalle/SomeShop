@@ -1,4 +1,5 @@
 ﻿using SomeShop.Models;
+using System.Linq.Expressions;
 
 namespace SomeShop.Services.Interfaces
 {
@@ -7,7 +8,7 @@ namespace SomeShop.Services.Interfaces
         // Manage ShopStorage
         void CreateShopStorage(ShopStorage item);
         IEnumerable<ShopStorage> GetShopStorages();
-        IEnumerable<ShopStorage> GetShopStorages(Func<ShopStorage, bool> predicate);
+        IEnumerable<ShopStorage> GetShopStorages(Expression<Func<ShopStorage, bool>> predicate);
         IEnumerable<ShopStorage> GetStorageByShopId(int id);
         IEnumerable<ShopStorage> GetStorageByProductId(int id);
         ShopStorage? GetStorageByKey(int shopId, int productId);

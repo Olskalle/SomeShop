@@ -2,6 +2,7 @@
 using SomeShop.Models;
 using SomeShop.Repositories;
 using SomeShop.Services.Interfaces;
+using System.Linq.Expressions;
 
 namespace SomeShop.Services
 {
@@ -17,13 +18,13 @@ namespace SomeShop.Services
 
 		public IEnumerable<Category> GetCategories() => _repository.Get();
 
-		public IEnumerable<Category> GetCategories(Func<Category, bool> predicate) => _repository.Get(predicate);
+		public IEnumerable<Category> GetCategories(Expression<Func<Category, bool>> predicate) => _repository.Get(predicate);
 
 		public Category? GetCategoryById(int id)
 		{
 			var result = _repository.Get(x => x.Id == id);
 
-			if (result is null) return null;
+			if (result is null) throw new NullReferenceException();
 
 			if (result.Count() > 1) throw new KeyNotUniqueException();
 

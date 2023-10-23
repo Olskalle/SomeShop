@@ -18,9 +18,9 @@ namespace SomeShop.Controllers
 		}
 
 		[HttpGet("all")]
-		public IActionResult GetAllShops()
+		public async Task<IActionResult> GetAllShops(CancellationToken cancellationToken)
 		{
-			var result = _service.GetShops();
+			var result = await _service.GetShopsAsync(cancellationToken);
 
 			if (result is null || result.Count() <= 0)
 			{
@@ -30,9 +30,9 @@ namespace SomeShop.Controllers
 			return Ok(result);
 		}
 		[HttpGet("{id}")]
-		public IActionResult GetShop(int id)
+		public async Task<IActionResult> GetShop(int id, CancellationToken cancellationToken)
 		{
-			var result = _service.GetShopById(id);
+			var result = await _service.GetShopByIdAsync(id, cancellationToken);
 
 			if (result is null) return NotFound();
 
@@ -40,43 +40,45 @@ namespace SomeShop.Controllers
 		}
 
 		[HttpPost("add")]
-		public IActionResult AddShop(Shop? item)
+		public async Task<IActionResult> AddShop(Shop? item, CancellationToken cancellationToken)
 		{
 			if (item is null) return BadRequest();
 
-			_service.CreateShop(item);
+			await _service.CreateShopAsync(item, cancellationToken);
 			return Ok();
 		}
 
 		[HttpPut("update/{id}")]
-		public IActionResult UpdateShop(int id, Shop? item)
+		public async Task<IActionResult> UpdateShop(int id, Shop? item, CancellationToken cancellationToken)
 		{
+			if (item is null || id != item.Id) return BadRequest();
 
-			if (id != item.Id) return BadRequest();
-
-			if (_service.GetShopById(id) != null)
+			if (await _service.GetShopByIdAsync(id, cancellationToken) != null)
 			{
-				_service.UpdateShop(item);
+				await _service.UpdateShopAsync(item, cancellationToken);
 			}
 			else
 			{
-				_service.CreateShop(item);
+				await _service.CreateShopAsync(item, cancellationToken);
 			}
 
 			return Ok();
 		}
 
 		[HttpDelete("delete/{id}")]
-		public IActionResult DeleteShop(int id)
+		public async Task<IActionResult> DeleteShop(int id, CancellationToken cancellationToken)
 		{
-			var shopToDelete = _service.GetShopById(id);
-			if (shopToDelete != null)
-			{
-				_service.DeleteShop(shopToDelete);
-				return Ok();
-			}
+			//var shopToDelete = _service.GetShopById(id);
+			//if (shopToDelete != null)
+			//{
+			//	_service.DeleteShop(shopToDelete);
+			//	return Ok();
+			//}
 
-			return NotFound();
+			//return NotFound();
+
+			await _service.DeleteShopByIdAsync(id, cancellationToken);
+			return NoContent();
 		}
 	}
 }

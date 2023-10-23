@@ -2,6 +2,7 @@
 using SomeShop.Models;
 using SomeShop.Repositories;
 using SomeShop.Services.Interfaces;
+using System.Linq.Expressions;
 
 namespace SomeShop.Services
 {
@@ -17,7 +18,7 @@ namespace SomeShop.Services
 
 		public IEnumerable<CartItem> GetCartItems() => _repository.Get();
 
-		public IEnumerable<CartItem> GetCartItems(Func<CartItem, bool> predicate) => _repository.Get(predicate);
+		public IEnumerable<CartItem> GetCartItems(Expression<Func<CartItem, bool>> predicate) => _repository.Get(predicate);
 
 		public CartItem? GetItemByKey(int sessionId, int productId)
 		{
@@ -25,7 +26,7 @@ namespace SomeShop.Services
 				.Get(x => x.SessionId == sessionId 
 					&& x.ProductId == productId);
 
-			if (result is null) return null;
+			if (result is null) throw new NullReferenceException();
 
 			if (result.Count() > 1) throw new KeyNotUniqueException();
 

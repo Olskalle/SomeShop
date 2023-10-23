@@ -2,6 +2,7 @@
 using SomeShop.Models;
 using SomeShop.Repositories;
 using SomeShop.Services.Interfaces;
+using System.Linq.Expressions;
 
 namespace SomeShop.Services
 {
@@ -20,13 +21,13 @@ namespace SomeShop.Services
 
 		public IEnumerable<ShopStorage> GetShopStorages() => _repository.Get();
 
-		public IEnumerable<ShopStorage> GetShopStorages(Func<ShopStorage, bool> predicate) => _repository.Get(predicate);
+		public IEnumerable<ShopStorage> GetShopStorages(Expression<Func<ShopStorage, bool>> predicate) => _repository.Get(predicate);
 
 		public ShopStorage? GetStorageByKey(int shopId, int productId)
 		{
 			var result = _repository.Get(x => x.ShopId == shopId && x.ProductId == productId);
 
-			if (result is null) return null;
+			if (result is null) throw new NullReferenceException();
 
 			if (result.Count() > 1) throw new KeyNotUniqueException();
 

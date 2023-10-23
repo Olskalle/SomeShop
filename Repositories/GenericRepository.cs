@@ -1,5 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
+using SomeShop.Extensions;
+
 
 namespace SomeShop.Repositories
 {
@@ -20,19 +22,19 @@ namespace SomeShop.Repositories
 			context.SaveChanges();
 		}
 
-		public IEnumerable<TEntity> Get()
+		public IQueryable<TEntity> Get()
 		{
 			return entitySet
 				.AsNoTracking()
-				.ToList();
+				.AsQueryable();
 		}
 
-		public IEnumerable<TEntity> Get(Func<TEntity, bool> func)
+		public IQueryable<TEntity> Get(Expression<Func<TEntity, bool>> func)
 		{
 			return entitySet
 				.AsNoTracking()
 				.Where(func)
-				.ToList();
+				.AsQueryable();
 		}
 
 		public void Remove(TEntity entity)
@@ -46,16 +48,17 @@ namespace SomeShop.Repositories
 			entitySet.Update(entity); 
 			context.SaveChanges();
 		}
-		public IEnumerable<TEntity> GetWithInclude(params Expression<Func<TEntity, object>>[] includeExpressions)
+		public IQueryable<TEntity> GetWithInclude(params Expression<Func<TEntity, object>>[] includeExpressions)
 		{
-			return Include(includeExpressions).ToList();
+			return Include(includeExpressions).AsQueryable();
 		}
 
-		public IEnumerable<TEntity> GetWithInclude(Func<TEntity, bool> predicate,
+		public IQueryable<TEntity> GetWithInclude(Expression<Func<TEntity, bool>> predicate,
 			params Expression<Func<TEntity, object>>[] includeProperties)
 		{
 			var query = Include(includeProperties);
-			return query.Where(predicate).ToList();
+			return query.Where(predicate)
+				.AsQueryable();
 		}
 
 		private IQueryable<TEntity> Include(params Expression<Func<TEntity, object>>[] includeExpressions)
@@ -68,20 +71,6 @@ namespace SomeShop.Repositories
 
 		public async Task CreateAsync(TEntity entity, CancellationToken cancellationToken)
 		{
-			//if (cancellationToken.IsCancellationRequested)
-			//{
-			//	throw new OperationCanceledException();
-			//}
-
-			//try
-			//{
-			//	await entitySet.AddAsync(entity);
-			//	context.SaveChanges();
-			//}
-			//catch (OperationCanceledException)
-			//{
-			//	throw;
-			//}
 			await RunWithCancellationHandling(cancellationToken, 
 				async () =>
 				{
@@ -103,27 +92,32 @@ namespace SomeShop.Repositories
 
 		public async Task<IEnumerable<TEntity>> GetAsync(Expression<Func<TEntity, bool>> func, CancellationToken cancellationToken)
 		{
-			throw new NotImplementedException();
+			return await RunWithCancellationHandling(cancellationToken,
+				async () =>
+				{
+					return await this.Get(func)
+						.ToListAsync();
+				});
 		}
 
 		public async Task UpdateAsync(TEntity entity, CancellationToken cancellationToken)
 		{
-			throw new NotImplementedException();
+			await RunWithCancellationHandling(cancellationToken,
+				Task.Run(() =>
+				{
+					entitySet.Update(entity);
+					context.SaveChanges();
+				}));
 		}
 
 		public async Task RemoveAsync(TEntity entity, CancellationToken cancellationToken)
 		{
-			throw new NotImplementedException();
-		}
-
-		public async Task<IEnumerable<TEntity>> GetWithIncludeAsync(params Expression<Func<TEntity, object>>[] includeExpressions)
-		{
-			throw new NotImplementedException();
-		}
-
-		public async Task<IEnumerable<TEntity>> GetWithIncludeAsync(Func<TEntity, bool> predicate, params Expression<Func<TEntity, object>>[] includeProperties)
-		{
-			throw new NotImplementedException();
+			await RunWithCancellationHandling(cancellationToken,
+				Task.Run(() =>
+				{
+					entitySet.Remove(entity);
+					context.SaveChanges();
+				}));
 		}
 
 		private async Task<T> RunWithCancellationHandling<T>(CancellationToken cancellationToken, Func<Task<T>> body)
@@ -152,6 +146,22 @@ namespace SomeShop.Repositories
 			try
 			{
 				await body();
+			}
+			catch (OperationCanceledException)
+			{
+				throw;
+			}
+		}
+		private async Task RunWithCancellationHandling(CancellationToken cancellationToken, Task task)
+		{
+			if (cancellationToken.IsCancellationRequested)
+			{
+				throw new OperationCanceledException();
+			}
+
+			try
+			{
+				await task;
 			}
 			catch (OperationCanceledException)
 			{

@@ -3,6 +3,7 @@ using SomeShop.Exceptions;
 using SomeShop.Models;
 using SomeShop.Repositories;
 using SomeShop.Services.Interfaces;
+using System.Linq.Expressions;
 
 namespace SomeShop.Services
 {
@@ -23,7 +24,7 @@ namespace SomeShop.Services
 
 		public IEnumerable<OrderItem> GetOrderItems() => _repository.Get();
 
-		public IEnumerable<OrderItem> GetOrderItems(Func<OrderItem, bool> predicate) => _repository.Get(predicate);
+		public IEnumerable<OrderItem> GetOrderItems(Expression<Func<OrderItem, bool>> predicate) => _repository.Get(predicate);
 
 		public IEnumerable<OrderItem> GetItemsByProductId(int id) => _repository.Get(x => x.ProductId == id);
 
@@ -33,7 +34,7 @@ namespace SomeShop.Services
 		{
 			var result = _repository.Get(x => x.OrderId == orderId && x.ProductId == productId);
 
-			if (result is null) return null;
+			if (result is null) throw new NullReferenceException();
 
 			if (result.Count() > 1) throw new KeyNotUniqueException();
 

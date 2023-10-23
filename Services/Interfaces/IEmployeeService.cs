@@ -1,4 +1,5 @@
 ﻿using SomeShop.Models;
+using System.Linq.Expressions;
 
 namespace SomeShop.Services.Interfaces
 {
@@ -7,7 +8,7 @@ namespace SomeShop.Services.Interfaces
         // Manage Employees
         void CreateEmployee(Employee item);
         IEnumerable<Employee> GetEmployees();
-        IEnumerable<Employee> GetEmployees(Func<Employee, bool> predicate);
+        IEnumerable<Employee> GetEmployees(Expression<Func<Employee, bool>> predicate);
         Employee? GetEmployeeById(int id);
         void UpdateEmployee(Employee item);
         void DeleteEmployee(Employee item);

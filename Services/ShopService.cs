@@ -3,6 +3,7 @@ using SomeShop.Exceptions;
 using SomeShop.Models;
 using SomeShop.Repositories;
 using SomeShop.Services.Interfaces;
+using System.Linq.Expressions;
 
 namespace SomeShop.Services
 {
@@ -15,25 +16,50 @@ namespace SomeShop.Services
 			_repository = repository;
         }
 
-		public void CreateShop(Shop item) => _repository.Create(item);
+		public async Task CreateShopAsync(Shop item, CancellationToken cancellationToken) 
+			=> await _repository.CreateAsync(item, cancellationToken);
 
-		public void DeleteShop(Shop item) => _repository.Remove(item);
+		public async Task DeleteShopAsync(Shop item, CancellationToken cancellationToken) 
+			=> await _repository.RemoveAsync(item, cancellationToken);
 
-		public Shop? GetShopById(int id)
+		public async Task DeleteShopByIdAsync(int id, CancellationToken cancellationToken)
 		{
-			var result = _repository.Get(x => x.Id == id);
+			if (cancellationToken.IsCancellationRequested)
+			{
+				throw new OperationCanceledException();
+			}
 
-			if (result is null) return null;
+			try
+			{
+				var item = _repository.Get(x => x.Id == id)?.Single();
+				if (item is null) throw new NullReferenceException();
+
+				await _repository.RemoveAsync(item, cancellationToken);
+			}
+			catch (OperationCanceledException)
+			{
+				throw;
+			}
+		}
+
+		public async Task<Shop?> GetShopByIdAsync(int id, CancellationToken cancellationToken)
+		{
+			var result = await _repository.GetAsync(x => x.Id == id, cancellationToken);
+
+			if (result is null) throw new NullReferenceException();
 
 			if (result.Count() > 1) throw new KeyNotUniqueException();
 
 			return result.FirstOrDefault();
 		}
 
-		public IEnumerable<Shop> GetShops() => _repository.Get();
+		public async Task<IEnumerable<Shop>> GetShopsAsync(CancellationToken cancellationToken) 
+			=> await _repository.GetAsync(cancellationToken);
 
-		public IEnumerable<Shop> GetShops(Func<Shop, bool> predicate) => _repository.Get(predicate);
+		public async Task<IEnumerable<Shop>> GetShopsAsync(Expression<Func<Shop, bool>> predicate, CancellationToken cancellationToken) 
+			=> await _repository.GetAsync(predicate, cancellationToken);
 
-		public void UpdateShop(Shop item) => _repository.Update(item);
+		public async Task UpdateShopAsync(Shop item, CancellationToken cancellationToken) 
+			=> await _repository.UpdateAsync(item, cancellationToken);
 	}
 }

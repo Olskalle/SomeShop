@@ -1,4 +1,5 @@
 ﻿using SomeShop.Models;
+using System.Linq.Expressions;
 
 namespace SomeShop.Services.Interfaces
 {
@@ -7,7 +8,7 @@ namespace SomeShop.Services.Interfaces
         // Manage CartItem
         void CreateCartItem(CartItem item);
         IEnumerable<CartItem> GetCartItems();
-        IEnumerable<CartItem> GetCartItems(Func<CartItem, bool> predicate);
+        IEnumerable<CartItem> GetCartItems(Expression<Func<CartItem, bool>> predicate);
         IEnumerable<CartItem> GetItemsBySessionId(int sessionId);
         IEnumerable<CartItem> GetItemsByProductId(int productId);
         CartItem? GetItemByKey(int sessionId, int productId);

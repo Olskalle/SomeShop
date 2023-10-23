@@ -1,4 +1,3 @@
-using SomeManufacturer.Services;
 using SomeShop.Models;
 using SomeShop.Repositories;
 using SomeShop.Services;
