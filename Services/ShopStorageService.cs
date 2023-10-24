@@ -2,6 +2,7 @@
 using SomeShop.Models;
 using SomeShop.Repositories;
 using SomeShop.Services.Interfaces;
+using System.Linq.Expressions;
 
 namespace SomeShop.Services
 {
@@ -14,29 +15,138 @@ namespace SomeShop.Services
             _repository = repository;
         }
 
-		public void CreateShopStorage(ShopStorage item) => _repository.Create(item);
-
-		public void DeleteShopStorage(ShopStorage item) => _repository.Remove(item);
-
-		public IEnumerable<ShopStorage> GetShopStorages() => _repository.Get();
-
-		public IEnumerable<ShopStorage> GetShopStorages(Func<ShopStorage, bool> predicate) => _repository.Get(predicate);
-
-		public ShopStorage? GetStorageByKey(int shopId, int productId)
+		public async Task CreateStorageAsync(ShopStorage item, CancellationToken cancellationToken)
 		{
-			var result = _repository.Get(x => x.ShopId == shopId && x.ProductId == productId);
+			cancellationToken.ThrowIfCancellationRequested();
 
-			if (result is null) return null;
-
-			if (result.Count() > 1) throw new KeyNotUniqueException();
-
-			return result.FirstOrDefault();
+			try
+			{
+				await _repository.UpdateAsync(item, cancellationToken);
+			}
+			catch (OperationCanceledException)
+			{
+				throw;
+			}
 		}
 
-		public IEnumerable<ShopStorage> GetStorageByProductId(int id) => _repository.Get(x => x.ProductId == id);
+		public async Task DeleteStorageAsync(ShopStorage item, CancellationToken cancellationToken)
+		{
+			cancellationToken.ThrowIfCancellationRequested();
 
-        public IEnumerable<ShopStorage> GetStorageByShopId(int id) => _repository.Get(x => x.ShopId == id);
+			try
+			{
+				await _repository.RemoveAsync(item, cancellationToken);
+			}
+			catch (OperationCanceledException)
+			{
+				throw;
+			}		
+		}
 
-        public void UpdateShopStorage(ShopStorage item) => _repository.Update(item);
-    }
+		public async Task<IEnumerable<ShopStorage>> GetStoragesAsync(CancellationToken cancellationToken)
+		{
+			cancellationToken.ThrowIfCancellationRequested();
+
+			try
+			{
+				return await _repository.GetAsync(cancellationToken);
+			}
+			catch (OperationCanceledException)
+			{
+				throw;
+			}
+		}
+
+		public async Task<IEnumerable<ShopStorage>> GetStoragesAsync(Expression<Func<ShopStorage, bool>> predicate, CancellationToken cancellationToken)
+		{
+			cancellationToken.ThrowIfCancellationRequested();
+
+			try
+			{
+				return await _repository.GetAsync(predicate, cancellationToken);
+			}
+			catch (OperationCanceledException)
+			{
+				throw;
+			}
+		}
+
+		public async Task<ShopStorage?> GetStorageByKeyAsync(int shopId, int productId, CancellationToken cancellationToken)
+		{
+			cancellationToken.ThrowIfCancellationRequested();
+
+			try
+			{
+				var result = await _repository.GetAsync(x => x.ShopId == shopId && x.ProductId == productId,cancellationToken);
+
+				if (result is null) throw new NullReferenceException();
+
+				if (result.Count() > 1) throw new KeyNotUniqueException();
+
+				return result.FirstOrDefault();
+			}
+			catch (OperationCanceledException)
+			{
+				throw;
+			}
+		}
+
+		public async Task<IEnumerable<ShopStorage>> GetStorageByProductIdAsync(int id, CancellationToken cancellationToken)
+		{
+			cancellationToken.ThrowIfCancellationRequested();
+
+			try
+			{
+				return await _repository.GetAsync(x => x.ProductId == id, cancellationToken);
+			}
+			catch (OperationCanceledException)
+			{
+				throw;
+			}
+		}
+
+		public async Task<IEnumerable<ShopStorage>> GetStorageByShopIdAsync(int id, CancellationToken cancellationToken)
+		{
+			cancellationToken.ThrowIfCancellationRequested();
+
+			try
+			{
+				return await _repository.GetAsync(x => x.ShopId == id, cancellationToken);
+			}
+			catch (OperationCanceledException)
+			{
+				throw;
+			}
+		}
+
+		public async Task UpdateStorageAsync(ShopStorage item, CancellationToken cancellationToken)
+		{
+			cancellationToken.ThrowIfCancellationRequested();
+
+			try
+			{
+				await _repository.UpdateAsync(item, cancellationToken);
+			}
+			catch (OperationCanceledException)
+			{
+				throw;
+			}
+		}
+
+		public async Task DeleteStorageByKeyAsync(int shopId, int productId, CancellationToken cancellationToken)
+		{
+			cancellationToken.ThrowIfCancellationRequested();
+
+			try
+			{
+				await _repository.DeleteAsync(
+					x => x.ShopId == shopId && x.ProductId == productId,
+					cancellationToken);
+			}
+			catch (OperationCanceledException)
+			{
+				throw;
+			}
+		}
+	}
 }

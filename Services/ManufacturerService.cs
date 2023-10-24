@@ -3,8 +3,9 @@ using SomeShop.Exceptions;
 using SomeShop.Models;
 using SomeShop.Repositories;
 using SomeShop.Services.Interfaces;
+using System.Linq.Expressions;
 
-namespace SomeManufacturer.Services
+namespace SomeShop.Services
 {
     public class ManufacturerService : IManufacturerService
     {
@@ -15,25 +16,106 @@ namespace SomeManufacturer.Services
             _repository = repository;
         }
 
-		public void CreateManufacturer(Manufacturer item) => _repository.Create(item);
+		public async Task CreateManufacturerAsync(Manufacturer item, CancellationToken cancellatioonToken)
+		{
+			cancellatioonToken.ThrowIfCancellationRequested();
+			try
+			{
+				await _repository.CreateAsync(item, cancellatioonToken);
+			}
+			catch (OperationCanceledException)
+			{
+				throw;
+			}
+		}
 
-		public void DeleteManufacturer(Manufacturer item) => _repository.Remove(item);
+		public async Task DeleteManufacturerAsync(Manufacturer item, CancellationToken cancellatioonToken)
+		{
+			cancellatioonToken.ThrowIfCancellationRequested();
+			try
+			{
+				await _repository.RemoveAsync(item, cancellatioonToken);
+			}
+			catch (OperationCanceledException)
+			{
+				throw;
+			}
+		}
 
-		public Manufacturer? GetManufacturerById(int id)
+		public async Task DeleteManufacturerByIdAsync(int id, CancellationToken cancellationToken)
+		{
+			cancellationToken.ThrowIfCancellationRequested();
+
+			try
+			{
+				await _repository.DeleteAsync(
+					x => x.Id == id,
+					cancellationToken);
+			}
+			catch (OperationCanceledException)
+			{
+				throw;
+			}
+		}
+
+		public async Task<Manufacturer> GetManufacturerByIdAsync(int id, CancellationToken cancellatioonToken)
         {
-            var result = _repository.Get(x => x.Id == id);
+			cancellatioonToken.ThrowIfCancellationRequested();
+			try
+			{
+				var result = await _repository.GetAsync(x => x.Id == id, cancellatioonToken);
 
-			if (result is null) return null;
+				if (result is null) throw new NullReferenceException();
 
-			if (result.Count() > 1) throw new KeyNotUniqueException();
+				if (result.Count() > 1) throw new KeyNotUniqueException();
 
-			return result.FirstOrDefault();
-        }
+				return result.FirstOrDefault();
+			}
+			catch (OperationCanceledException)
+			{
+				throw;
+			}
+		}
 
-		public IEnumerable<Manufacturer> GetManufacturers() => _repository.Get();
+		public async Task<IEnumerable<Manufacturer>> GetManufacturersAsync(CancellationToken cancellatioonToken)
+		{
+			cancellatioonToken.ThrowIfCancellationRequested();
 
-		public IEnumerable<Manufacturer> GetManufacturers(Func<Manufacturer, bool> predicate) => _repository.Get(predicate);
+			try
+			{
+				return await _repository.GetAsync(cancellatioonToken);
+			}
+			catch (OperationCanceledException)
+			{
+				throw;
+			}
+		}
 
-		public void UpdateManufacturer(Manufacturer item) => _repository.Update(item);
+		public async Task<IEnumerable<Manufacturer>> GetManufacturersAsync(Expression<Func<Manufacturer, bool>> predicate, CancellationToken cancellatioonToken)
+		{
+			cancellatioonToken.ThrowIfCancellationRequested();
+
+			try
+			{
+				return await _repository.GetAsync(predicate, cancellatioonToken);
+			}
+			catch (OperationCanceledException)
+			{
+				throw;
+			}
+		}
+
+		public async Task UpdateManufacturerAsync(Manufacturer item, CancellationToken cancellatioonToken)
+		{
+			cancellatioonToken.ThrowIfCancellationRequested();
+			try
+			{
+				await _repository.UpdateAsync(item, cancellatioonToken);
+			}
+			catch (OperationCanceledException)
+			{
+				throw;
+			}
+		}
 	}
 }

@@ -1,23 +1,17 @@
 ﻿using SomeShop.Models;
+using System.Linq.Expressions;
 
 namespace SomeShop.Services.Interfaces
 {
     public interface IPaymentStatusService
     {
         // Manage PaymentStatuses
-        void CreatePaymentStatus(PaymentStatus item);
-        IEnumerable<PaymentStatus> GetPaymentStatuses();
-        IEnumerable<PaymentStatus> GetPaymentStatuses(Func<PaymentStatus, bool> predicate);
-        PaymentStatus? GetPaymentStatusById(int id);
-        void UpdatePaymentStatus(PaymentStatus item);
-        void DeletePaymentStatus(PaymentStatus item);
+        Task CreatePaymentStatusAsync(PaymentStatus item, CancellationToken cancellationToken);
+        Task<IEnumerable<PaymentStatus>> GetPaymentStatusesAsync(CancellationToken cancellationToken);
+        Task<IEnumerable<PaymentStatus>> GetPaymentStatusesAsync(Expression<Func<PaymentStatus, bool>> predicate, CancellationToken cancellationToken);
+        Task<PaymentStatus?> GetPaymentStatusByIdAsync(int id, CancellationToken cancellationToken);
+        Task UpdatePaymentStatusAsync(PaymentStatus item, CancellationToken cancellationToken);
+        Task DeletePaymentStatusAsync(PaymentStatus item, CancellationToken cancellationToken);
+        Task DeletePaymentStatusByIdAsync(int id, CancellationToken cancellationToken);
     }
 }
-/*
-void Create%EntityType%(%EntityType% item);
-IEnumerable<%EntityType%> Get%EntityType%s();
-IEnumerable<%EntityType%> Get%EntityType%s(Func<%EntityType%, bool> predicate);
-%EntityType%? Get%EntityType%ById(int id);
-void Update%EntityType%(%EntityType% item);
-void Delete%EntityType%(%EntityType% item);
- */

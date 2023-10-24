@@ -17,83 +17,130 @@ namespace SomeShop.Controllers
 		}
 
 		[HttpGet("all")]
-		public IActionResult GetAllShopStorages()
+		public async Task<IActionResult> GetAllShopStorages(CancellationToken cancellationToken)
 		{
-			var result = _service.GetShopStorages();
-
-			if (result is null || !result.Any())
+			try
 			{
-				return NoContent();
-			}
+				var result = await _service.GetStoragesAsync(cancellationToken);
 
-			return Ok(result);
+				if (result is null || !result.Any())
+				{
+					return NoContent();
+				}
+
+				return Ok(result);
+			}
+			catch (OperationCanceledException)
+			{
+				return BadRequest();
+			}
 		}
 		[HttpGet("shop/{id}")]
-		public IActionResult GetItemsBySession(int id)
+		public async Task<IActionResult> GetStoragesBySession(int id, CancellationToken cancellationToken)
 		{
-			var result = _service.GetStorageByShopId(id);
+			try
+			{
+				var result = await _service.GetStorageByShopIdAsync(id, cancellationToken);
 
-			if (result is null || !result.Any()) return NoContent();
+				if (result is null || !result.Any()) return NoContent();
 
-			return Ok(result);
+				return Ok(result);
+			}
+			catch (OperationCanceledException)
+			{
+				return BadRequest();
+			}
 		}
 
 		[HttpGet("product/{id}")]
-		public IActionResult GetItemsByProduct(int id)
+		public async Task<IActionResult> GetStoragesByProduct(int id, CancellationToken cancellationToken)
 		{
-			var result = _service.GetStorageByProductId(id);
+			try
+			{
+				var result = await _service.GetStorageByProductIdAsync(id, cancellationToken);
 
-			if (result is null || !result.Any()) return NoContent();
+				if (result is null || !result.Any()) return NoContent();
 
-			return Ok(result);
+				return Ok(result);
+			}
+			catch (OperationCanceledException)
+			{
+				return BadRequest();
+			}
 		}
 
-		[HttpGet("{orderId}&{productId}")]
-		public IActionResult GetItemByKey(int orderId, int productId)
+		[HttpGet("{shopId}&{productId}")]
+		public async Task<IActionResult> GetStorageByKey(int shopId, int productId, CancellationToken cancellationToken)
 		{
-			var result = _service.GetStorageByKey(orderId, productId);
+			try
+			{
+				var result = await _service.GetStorageByKeyAsync(shopId, productId, cancellationToken);
 
-			if (result is null) return NotFound();
+				if (result is null) return NotFound();
 
-			return Ok(result);
+				return Ok(result);
+			}
+			catch (OperationCanceledException)
+			{
+				return BadRequest();
+			}
 		}
 
 		[HttpPost("add")]
-		public IActionResult AddShopStorage(ShopStorage ShopStorage)
+		public async Task<IActionResult> AddShopStorage(ShopStorage? item, CancellationToken cancellationToken)
 		{
-			_service.CreateShopStorage(ShopStorage);
-			return Ok();
+			if (item is null) return BadRequest();
+
+			try
+			{
+				await _service.CreateStorageAsync(item, cancellationToken);
+				return Ok();
+			}
+			catch (OperationCanceledException)
+			{
+				return BadRequest();
+			}
 		}
 
-		[HttpPut("update/{orderId}&{productId}")]
-		public IActionResult UpdateShopStorage(int orderId, int productId, ShopStorage item)
+		[HttpPut("update/{shopId}&{productId}")]
+		public async Task<IActionResult> UpdateShopStorage(int shopId, int productId, ShopStorage? item, CancellationToken cancellationToken)
 		{
-
-			if (orderId != item.ShopId || productId != item.ProductId)
+			if (item is null || shopId != item.ShopId || productId != item.ProductId)
 			{
 				return BadRequest();
 			}
 
-			if (_service.GetStorageByKey(orderId, productId) != null)
+			try
 			{
-				_service.UpdateShopStorage(item);
-				return Ok();
-			}
+				var toUpdate = await _service.GetStorageByKeyAsync(shopId, productId, cancellationToken);
 
-			return NotFound();
+				if (toUpdate != null)
+				{
+					await _service.UpdateStorageAsync(item, cancellationToken);
+					return Ok();
+				}
+
+				return NotFound();
+			}
+			catch (OperationCanceledException)
+			{
+				return BadRequest();
+			}
 		}
 
-		[HttpDelete("delete/{id}")]
-		public IActionResult DeleteShopStorage(int orderId, int productId)
+		[HttpDelete("delete/{shopId}&{productId}")]
+		public async Task<IActionResult> DeleteShopStorage(int shopId, int productId, CancellationToken cancellationToken)
 		{
-			var ShopStorageToDelete = _service.GetStorageByKey(orderId, productId);
-			if (ShopStorageToDelete != null)
+			try
 			{
-				_service.DeleteShopStorage(ShopStorageToDelete);
-				return Ok();
-			}
+				await _service.DeleteStorageByKeyAsync(shopId, productId, cancellationToken);
 
-			return NotFound();
+				return NoContent();
+			}
+			catch (OperationCanceledException)
+			{
+				return BadRequest();
+			}
 		}
 	}
 }

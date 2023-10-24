@@ -16,64 +16,91 @@ namespace SomeShop.Controllers
             _service = service;
         }
 
-        [HttpGet("all")]
-        public IActionResult GetAllEmployees()
-        {
-            var result = _service.GetEmployees();
+		[HttpGet("all")]
+		public async Task<IActionResult> GetAllEmployees(CancellationToken cancellationToken)
+		{
+			try
+			{
+				var result = await _service.GetEmployeesAsync(cancellationToken);
 
-            if (result is null || result.Count() <= 0)
-            {
-                return NoContent();
-            }
+				if (result is null || result.Count() <= 0)
+				{
+					return NoContent();
+				}
 
-            return Ok(result);
-        }
-        [HttpGet("{id}")]
-        public IActionResult GetEmployee(int id)
-        {
-            var result = _service.GetEmployeeById(id);
+				return Ok(result);
+			}
+			catch (OperationCanceledException)
+			{
+				return BadRequest();
+			}
+		}
+		[HttpGet("{id}")]
+		public async Task<IActionResult> GetEmployee(int id, CancellationToken cancellationToken)
+		{
+			try
+			{
+				var result = await _service.GetEmployeeByIdAsync(id, cancellationToken);
 
-            if (result is null) return NotFound();
+				if (result is null) return NotFound();
 
-            return Ok(result);
-        }
+				return Ok(result);
+			}
+			catch (OperationCanceledException)
+			{
+				return BadRequest();
+			}
+		}
 
-        [HttpPost("add")]
-        public IActionResult AddEmployee(Employee item)
-        {
-            _service.CreateEmployee(item);
-            return Ok();
-        }
+		[HttpPost("add")]
+		public async Task<IActionResult> AddEmployee(Employee? item, CancellationToken cancellationToken)
+		{
+			if (item is null) return BadRequest();
 
-        [HttpPut("update/{id}")]
-        public IActionResult UpdateEmployee(int id, Employee item)
-        {
+			try
+			{
+				await _service.CreateEmployeeAsync(item, cancellationToken);
+				return Ok();
+			}
+			catch (OperationCanceledException)
+			{
+				return BadRequest();
+			}
+		}
 
-            if (id != item.Id) return BadRequest();
+		[HttpPut("update/{id}")]
+		public async Task<IActionResult> UpdateEmployee(int id, Employee? item, CancellationToken cancellationToken)
+		{
+			if (item is null || id != item.Id) return BadRequest();
 
-            if (_service.GetEmployeeById(id) != null)
-            {
-                _service.UpdateEmployee(item);
-            }
-            else
-            {
-                _service.CreateEmployee(item);
-            }
+			try
+			{
+				var toUpdate = await _service.GetEmployeeByIdAsync(id, cancellationToken);
+				if (toUpdate != null)
+				{
+					await _service.UpdateEmployeeAsync(item, cancellationToken);
+					return Ok();
+				}
+				return NotFound();
+			}
+			catch (OperationCanceledException)
+			{
+				return BadRequest();
+			}
+		}
 
-            return Ok();
-        }
-
-        [HttpDelete("delete/{id}")]
-        public IActionResult DeleteEmployee(int id)
-        {
-            var itemToDelete = _service.GetEmployeeById(id);
-            if (itemToDelete != null)
-            {
-                _service.DeleteEmployee(itemToDelete);
-                return Ok();
-            }
-
-            return NotFound();
-        }
-    }
+		[HttpDelete("delete/{id}")]
+		public async Task<IActionResult> DeleteEmployee(int id, CancellationToken cancellationToken)
+		{
+			try
+			{
+				await _service.DeleteEmployeeByIdAsync(id, cancellationToken);
+				return NoContent();
+			}
+			catch (OperationCanceledException)
+			{
+				return BadRequest();
+			}
+		}
+	}
 }

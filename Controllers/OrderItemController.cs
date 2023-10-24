@@ -17,83 +17,130 @@ namespace SomeShop.Controllers
 		}
 
 		[HttpGet("all")]
-		public IActionResult GetAllOrderItems()
+		public async Task<IActionResult> GetAllOrderItems(CancellationToken cancellationToken)
 		{
-			var result = _service.GetOrderItems();
-
-			if (result is null || !result.Any())
+			try
 			{
-				return NoContent();
-			}
+				var result = await _service.GetOrderItemsAsync(cancellationToken);
 
-			return Ok(result);
+				if (result is null || !result.Any())
+				{
+					return NoContent();
+				}
+
+				return Ok(result);
+			}
+			catch (OperationCanceledException)
+			{
+				return BadRequest();
+			}
 		}
 		[HttpGet("order/{id}")]
-		public IActionResult GetItemsBySession(int id)
+		public async Task<IActionResult> GetItemsByOrder(int id, CancellationToken cancellationToken)
 		{
-			var result = _service.GetItemsByOrderId(id);
+			try
+			{
+				var result = await _service.GetItemsByOrderIdAsync(id, cancellationToken);
 
-			if (result is null || !result.Any()) return NoContent();
+				if (result is null || !result.Any()) return NoContent();
 
-			return Ok(result);
+				return Ok(result);
+			}
+			catch (OperationCanceledException)
+			{
+				return BadRequest();
+			}
 		}
 
 		[HttpGet("product/{id}")]
-		public IActionResult GetItemsByProduct(int id)
+		public async Task<IActionResult> GetItemsByProduct(int id, CancellationToken cancellationToken)
 		{
-			var result = _service.GetItemsByProductId(id);
+			try
+			{
+				var result = await _service.GetItemsByProductIdAsync(id, cancellationToken);
 
-			if (result is null || !result.Any()) return NoContent();
+				if (result is null || !result.Any()) return NoContent();
 
-			return Ok(result);
+				return Ok(result);
+			}
+			catch (OperationCanceledException)
+			{
+				return BadRequest();
+			}
 		}
 
 		[HttpGet("{orderId}&{productId}")]
-		public IActionResult GetItemByKey(int orderId, int productId)
+		public async Task<IActionResult> GetItemByKey(int orderId, int productId, CancellationToken cancellationToken)
 		{
-			var result = _service.GetItemByKey(orderId, productId);
+			try
+			{
+				var result = await _service.GetItemByKeyAsync(orderId, productId, cancellationToken);
 
-			if (result is null) return NotFound();
+				if (result is null) return NotFound();
 
-			return Ok(result);
+				return Ok(result);
+			}
+			catch (OperationCanceledException)
+			{
+				return BadRequest();
+			}
 		}
 
 		[HttpPost("add")]
-		public IActionResult AddOrderItem(OrderItem OrderItem)
+		public async Task<IActionResult> AddOrderItem(OrderItem? item, CancellationToken cancellationToken)
 		{
-			_service.CreateOrderItem(OrderItem);
-			return Ok();
+			if (item is null) return BadRequest();
+
+			try
+			{
+				await _service.CreateOrderItemAsync(item, cancellationToken);
+				return Ok();
+			}
+			catch (OperationCanceledException)
+			{
+				return BadRequest();
+			}
 		}
 
 		[HttpPut("update/{orderId}&{productId}")]
-		public IActionResult UpdateOrderItem(int orderId, int productId, OrderItem item)
+		public async Task<IActionResult> UpdateOrderItem(int orderId, int productId, OrderItem? item, CancellationToken cancellationToken)
 		{
-
-			if (orderId != item.OrderId || productId != item.ProductId)
+			if (item is null || orderId != item.OrderId || productId != item.ProductId)
 			{
 				return BadRequest();
 			}
 
-			if (_service.GetItemByKey(orderId, productId) != null)
+			try
 			{
-				_service.UpdateOrderItem(item);
-				return Ok();
-			}
+				var toUpdate = await _service.GetItemByKeyAsync(orderId, productId, cancellationToken);
 
-			return NotFound();
+				if (toUpdate != null)
+				{
+					await _service.UpdateOrderItemAsync(item, cancellationToken);
+					return Ok();
+				}
+
+				return NotFound();
+			}
+			catch (OperationCanceledException)
+			{
+				return BadRequest();
+			}
 		}
 
-		[HttpDelete("delete/{id}")]
-		public IActionResult DeleteOrderItem(int orderId, int productId)
+		[HttpDelete("delete/{orderId}&{productId}")]
+		public async Task<IActionResult> DeleteOrderItem(int orderId, int productId, CancellationToken cancellationToken)
 		{
-			var OrderItemToDelete = _service.GetItemByKey(orderId, productId);
-			if (OrderItemToDelete != null)
+			try
 			{
-				_service.DeleteOrderItem(OrderItemToDelete);
-				return Ok();
-			}
+				await _service.DeleteOrderItemByKeyAsync(orderId, productId, cancellationToken);
 
-			return NotFound();
+				return NoContent();
+			}
+			catch (OperationCanceledException)
+			{
+				return BadRequest();
+			}
 		}
 	}
 }

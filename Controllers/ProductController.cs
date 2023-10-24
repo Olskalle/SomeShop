@@ -17,63 +17,90 @@ namespace SomeShop.Controllers
 		}
 
 		[HttpGet("all")]
-		public IActionResult GetAllProducts()
+		public async Task<IActionResult> GetAllProducts(CancellationToken cancellationToken)
 		{
-			var result = _service.GetProducts();
-
-			if (result is null || result.Count() <= 0)
+			try
 			{
-				return NoContent();
-			}
+				var result = await _service.GetProductsAsync(cancellationToken);
 
-			return Ok(result);
+				if (result is null || result.Count() <= 0)
+				{
+					return NoContent();
+				}
+
+				return Ok(result);
+			}
+			catch (OperationCanceledException)
+			{
+				return BadRequest();
+			}
 		}
 		[HttpGet("{id}")]
-		public IActionResult GetProduct(int id)
+		public async Task<IActionResult> GetProduct(int id, CancellationToken cancellationToken)
 		{
-			var result = _service.GetProductById(id);
+			try
+			{
+				var result = await _service.GetProductByIdAsync(id, cancellationToken);
 
-			if (result is null) return NotFound();
+				if (result is null) return NotFound();
 
-			return Ok(result);
+				return Ok(result);
+			}
+			catch (OperationCanceledException)
+			{
+				return BadRequest();
+			}
 		}
 
 		[HttpPost("add")]
-		public IActionResult AddProduct(Product item)
+		public async Task<IActionResult> AddProduct(Product? item, CancellationToken cancellationToken)
 		{
-			_service.CreateProduct(item);
-			return Ok();
+			if (item is null) return BadRequest();
+
+			try
+			{
+				await _service.CreateProductAsync(item, cancellationToken);
+				return Ok();
+			}
+			catch (OperationCanceledException)
+			{
+				return BadRequest();
+			}
 		}
 
 		[HttpPut("update/{id}")]
-		public IActionResult UpdateProduct(int id, Product item)
+		public async Task<IActionResult> UpdateProduct(int id, Product? item, CancellationToken cancellationToken)
 		{
+			if (item is null || id != item.Id) return BadRequest();
 
-			if (id != item.Id) return BadRequest();
-
-			if (_service.GetProductById(id) != null)
+			try
 			{
-				_service.UpdateProduct(item);
+				var toUpdate = await _service.GetProductByIdAsync(id, cancellationToken);
+				if (toUpdate != null)
+				{
+					await _service.UpdateProductAsync(item, cancellationToken);
+					return Ok();
+				}
+				return NotFound();
 			}
-			else
+			catch (OperationCanceledException)
 			{
-				_service.CreateProduct(item);
+				return BadRequest();
 			}
-
-			return Ok();
 		}
 
 		[HttpDelete("delete/{id}")]
-		public IActionResult DeleteProduct(int id)
+		public async Task<IActionResult> DeleteProduct(int id, CancellationToken cancellationToken)
 		{
-			var itemToDelete = _service.GetProductById(id);
-			if (itemToDelete != null)
+			try
 			{
-				_service.DeleteProduct(itemToDelete);
-				return Ok();
+				await _service.DeleteProductByIdAsync(id, cancellationToken);
+				return NoContent();
 			}
-
-			return NotFound();
+			catch (OperationCanceledException)
+			{
+				return BadRequest();
+			}
 		}
 	}
 }

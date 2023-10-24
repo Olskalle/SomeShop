@@ -17,63 +17,90 @@ namespace SomeShop.Controllers
 		}
 
 		[HttpGet("all")]
-		public IActionResult GetAllPayments()
+		public async Task<IActionResult> GetAllPayments(CancellationToken cancellationToken)
 		{
-			var result = _service.GetPayments();
-
-			if (result is null || result.Count() <= 0)
+			try
 			{
-				return NoContent();
+				var result = await _service.GetPaymentsAsync(cancellationToken);
+
+				if (result is null || result.Count() <= 0)
+				{
+					return NoContent();
+				}
+
+				return Ok(result);
 			}
-
-			return Ok(result);
+			catch (OperationCanceledException)
+			{
+				return BadRequest();
+			}
 		}
-		[HttpGet("order/{orderId}")]
-		public IActionResult GetPayment(int orderId)
+		[HttpGet("{id}")]
+		public async Task<IActionResult> GetPayment(int id, CancellationToken cancellationToken)
 		{
-			var result = _service.GetPaymentByOrderId(orderId);
+			try
+			{
+				var result = await _service.GetPaymentByOrderIdAsync(id, cancellationToken);
 
-			if (result is null) return NotFound();
+				if (result is null) return NotFound();
 
-			return Ok(result);
+				return Ok(result);
+			}
+			catch (OperationCanceledException)
+			{
+				return BadRequest();
+			}
 		}
 
 		[HttpPost("add")]
-		public IActionResult AddPayment(Payment item)
+		public async Task<IActionResult> AddPayment(Payment? item, CancellationToken cancellationToken)
 		{
-			_service.CreatePayment(item);
-			return Ok();
+			if (item is null) return BadRequest();
+
+			try
+			{
+				await _service.CreatePaymentAsync(item, cancellationToken);
+				return Ok();
+			}
+			catch (OperationCanceledException)
+			{
+				return BadRequest();
+			}
 		}
 
 		[HttpPut("update/{id}")]
-		public IActionResult UpdatePayment(int id, Payment item)
+		public async Task<IActionResult> UpdatePayment(int id, Payment? item, CancellationToken cancellationToken)
 		{
+			if (item is null || id != item.OrderId) return BadRequest();
 
-			if (id != item.OrderId) return BadRequest();
-
-			if (_service.GetPaymentByOrderId(id) != null)
+			try
 			{
-				_service.UpdatePayment(item);
+				var toUpdate = await _service.GetPaymentByOrderIdAsync(id, cancellationToken);
+				if (toUpdate != null)
+				{
+					await _service.UpdatePaymentAsync(item, cancellationToken);
+					return Ok();
+				}
+				return NotFound();
 			}
-			else
+			catch (OperationCanceledException)
 			{
-				_service.CreatePayment(item);
+				return BadRequest();
 			}
-
-			return Ok();
 		}
 
 		[HttpDelete("delete/{id}")]
-		public IActionResult DeletePayment(int id)
+		public async Task<IActionResult> DeletePayment(int id, CancellationToken cancellationToken)
 		{
-			var itemToDelete = _service.GetPaymentByOrderId(id);
-			if (itemToDelete != null)
+			try
 			{
-				_service.DeletePayment(itemToDelete);
-				return Ok();
+				await _service.DeletePaymentByOrderIdAsync(id, cancellationToken);
+				return NoContent();
 			}
-
-			return NotFound();
+			catch (OperationCanceledException)
+			{
+				return BadRequest();
+			}
 		}
 	}
 }

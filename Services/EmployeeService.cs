@@ -2,6 +2,8 @@
 using SomeShop.Models;
 using SomeShop.Repositories;
 using SomeShop.Services.Interfaces;
+using System;
+using System.Linq.Expressions;
 
 namespace SomeShop.Services
 {
@@ -14,25 +16,104 @@ namespace SomeShop.Services
 			_repository = repository;
         }
 
-		public void CreateEmployee(Employee item) => _repository.Create(item);
-
-		public void DeleteEmployee(Employee item) => _repository.Remove(item);
-
-		public Employee? GetEmployeeById(int id)
+		public async Task CreateEmployeeAsync(Employee item, CancellationToken cancellationToken)
 		{
-			var result = _repository.Get(x => x.Id == id);
-
-			if (result is null) return null;
-
-			if (result.Count() > 1) throw new KeyNotUniqueException();
-
-			return result.FirstOrDefault();
+			cancellationToken.ThrowIfCancellationRequested();
+			try
+			{
+				await _repository.CreateAsync(item, cancellationToken);
+			}
+			catch (OperationCanceledException)
+			{
+				throw;
+			}
 		}
 
-		public IEnumerable<Employee> GetEmployees() => _repository.Get();
+		public async Task DeleteEmployeeAsync(Employee item, CancellationToken cancellationToken)
+		{
+			cancellationToken.ThrowIfCancellationRequested();
+			try
+			{
+				await _repository.RemoveAsync(item, cancellationToken);
+			}
+			catch (OperationCanceledException)
+			{
+				throw;
+			}
+		}
 
-		public IEnumerable<Employee> GetEmployees(Func<Employee, bool> predicate) => _repository.Get(predicate);
+		public async Task DeleteEmployeeByIdAsync(int id, CancellationToken cancellationToken)
+		{
+			cancellationToken.ThrowIfCancellationRequested();
 
-		public void UpdateEmployee(Employee item) => _repository.Update(item);
+			try
+			{
+				await _repository.DeleteAsync(
+					x => x.Id == id,
+					cancellationToken);
+			}
+			catch (OperationCanceledException)
+			{
+				throw;
+			}
+		}
+
+		public async Task<Employee> GetEmployeeByIdAsync(int id, CancellationToken cancellationToken)
+		{
+			cancellationToken.ThrowIfCancellationRequested();
+			try
+			{
+				var result = await _repository.GetAsync(x => x.Id == id, cancellationToken);
+
+				if (result is null) throw new NullReferenceException();
+
+				if (result.Count() > 1) throw new KeyNotUniqueException();
+
+				return result.FirstOrDefault();
+			}
+			catch (OperationCanceledException)
+			{
+				throw;
+			}
+		}
+
+		public async Task<IEnumerable<Employee>> GetEmployeesAsync(CancellationToken cancellationToken)
+		{
+			cancellationToken.ThrowIfCancellationRequested();
+			try
+			{
+				return await _repository.GetAsync(cancellationToken);
+			}
+			catch (OperationCanceledException)
+			{
+				throw;
+			}
+		}
+
+		public async Task<IEnumerable<Employee>> GetEmployeesAsync(Expression<Func<Employee, bool>> predicate, CancellationToken cancellationToken)
+		{
+			cancellationToken.ThrowIfCancellationRequested();
+			try
+			{
+				return await _repository.GetAsync(predicate, cancellationToken);
+			}
+			catch (OperationCanceledException)
+			{
+				throw;
+			}
+		}
+
+		public async Task UpdateEmployeeAsync(Employee item, CancellationToken cancellationToken)
+		{
+			cancellationToken.ThrowIfCancellationRequested();
+			try
+			{
+				await _repository.UpdateAsync(item, cancellationToken);
+			}
+			catch (OperationCanceledException)
+			{
+				throw;
+			}
+		}
 	}
 }
