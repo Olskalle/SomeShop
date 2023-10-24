@@ -7,7 +7,7 @@ namespace SomeShop
 {
     public class Program
 	{
-		public static void Main(string[] args)
+		public static async Task Main(string[] args)
 		{
 			var builder = WebApplication.CreateBuilder(args);
 
@@ -18,7 +18,7 @@ namespace SomeShop
 			builder.Services.AddScoped<IOrderItemService, OrderItemService>()
 				.AddScoped<ICategoryService, CategoryService>()
 				.AddScoped<IClientService, ClientService>()
-				.AddScoped<IEmployeeService, EmployeeService>()
+				.AddScoped<async Task<IEmployeeService, EmployeeService>()
 				.AddScoped<IManufacturerService, ManufacturerService>()
 				.AddScoped<IOrderService, OrderService>()
 				.AddScoped<IOrderItemService, OrderItemService>()

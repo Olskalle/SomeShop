@@ -16,20 +16,20 @@ namespace SomeShop.Repositories
 			entitySet = context.Set<TEntity>();
         }
 
-        public void Create(TEntity entity)
+        public async Task Create(TEntity entity)
 		{
 			entitySet.Add(entity);
 			context.SaveChanges();
 		}
 
-		public IQueryable<TEntity> Get()
+		public IQueryable<TEntity>> Get()
 		{
 			return entitySet
 				.AsNoTracking()
 				.AsQueryable();
 		}
 
-		public IQueryable<TEntity> Get(Expression<Func<TEntity, bool>> func)
+		public IQueryable<TEntity>> Get(Expression<Func<TEntity, bool>> func)
 		{
 			return entitySet
 				.AsNoTracking()
@@ -37,23 +37,23 @@ namespace SomeShop.Repositories
 				.AsQueryable();
 		}
 
-		public void Remove(TEntity entity)
+		public async Task Remove(TEntity entity)
 		{
 			entitySet.Remove(entity); 
 			context.SaveChanges();
 		}
 
-		public void Update(TEntity entity)
+		public async Task Update(TEntity entity)
 		{
 			entitySet.Update(entity); 
 			context.SaveChanges();
 		}
-		public IQueryable<TEntity> GetWithInclude(params Expression<Func<TEntity, object>>[] includeExpressions)
+		public IQueryable<TEntity>> GetWithInclude(params Expression<Func<TEntity, object>>[] includeExpressions)
 		{
 			return Include(includeExpressions).AsQueryable();
 		}
 
-		public IQueryable<TEntity> GetWithInclude(Expression<Func<TEntity, bool>> predicate,
+		public IQueryable<TEntity>> GetWithInclude(Expression<Func<TEntity, bool>> predicate,
 			params Expression<Func<TEntity, object>>[] includeProperties)
 		{
 			var query = Include(includeProperties);
@@ -79,7 +79,7 @@ namespace SomeShop.Repositories
 				});
 		}
 
-		public async Task<IEnumerable<TEntity>> GetAsync(CancellationToken cancellationToken)
+		public async Task<async Task<IEnumerable<TEntity>>> GetAsync(CancellationToken cancellationToken)
 		{
 			return await RunWithCancellationHandling(cancellationToken,
 				async () =>
@@ -90,7 +90,7 @@ namespace SomeShop.Repositories
 				});
 		}
 
-		public async Task<IEnumerable<TEntity>> GetAsync(Expression<Func<TEntity, bool>> func, CancellationToken cancellationToken)
+		public async Task<async Task<IEnumerable<TEntity>>> GetAsync(Expression<Func<TEntity, bool>> func, CancellationToken cancellationToken)
 		{
 			return await RunWithCancellationHandling(cancellationToken,
 				async () =>

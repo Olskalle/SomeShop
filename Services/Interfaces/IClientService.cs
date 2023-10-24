@@ -6,11 +6,11 @@ namespace SomeShop.Services.Interfaces
 	public interface IClientService
     {
         // Manage Client
-        void CreateClient(Client client);
-        IEnumerable<Client> GetClients();
-        IEnumerable<Client> GetClients(Expression<Func<Client, bool>> predicate);
-        Client? GetClientById(int id);
-        void UpdateClient(Client client);
-        void DeleteClient(Client client);
+        Task CreateClientAsync(Client client, CancellationToken cancellationToken);
+        Task<async Task<IEnumerable<Client>>> GetClientsAsync(CancellationToken cancellationToken);
+        Task<async Task<IEnumerable<Client>>> GetClientsAsync(Expression<Func<Client, bool>> predicate, CancellationToken cancellationToken);
+        Task<Client?>> GetClientByIdAsync(int id, CancellationToken cancellationToken);
+        Task UpdateClientAsync(Client client, CancellationToken cancellationToken);
+        Task DeleteClientAsync(Client client, CancellationToken cancellationToken);
     }
 }

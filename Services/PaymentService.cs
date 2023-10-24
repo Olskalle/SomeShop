@@ -15,9 +15,9 @@ namespace SomeShop.Services
 			_repository = repository;
 		}
 
-		public void CreatePayment(Payment item) => _repository.Create(item);
+		public async Task CreatePayment(Payment item) => _repository.Create(item);
 
-		public void DeletePayment(Payment item) => _repository.Remove(item);
+		public async Task DeletePayment(Payment item) => _repository.Remove(item);
 
 		public Payment? GetPaymentByOrderId(int id)
 		{
@@ -30,9 +30,9 @@ namespace SomeShop.Services
 			return result.FirstOrDefault();
 		}
 
-		public IEnumerable<Payment> GetPayments() => _repository.Get();
-		public IEnumerable<Payment> GetPayments(Expression<Func<Payment, bool>> predicate) => _repository.Get(predicate);
+		public async Task<IEnumerable<Payment>> GetPayments() => _repository.Get();
+		public async Task<IEnumerable<Payment>> GetPayments(Expression<Func<Payment, bool>> predicate) => _repository.Get(predicate);
 
-		public void UpdatePayment(Payment item) => _repository.Update(item);
+		public async Task UpdatePayment(Payment item) => _repository.Update(item);
 	}
 }

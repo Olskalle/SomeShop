@@ -15,9 +15,9 @@ namespace SomeShop.Services
 			_repository = repository;
 		}
 
-		public void CreatePaymentStatus(PaymentStatus item) => _repository.Create(item);
+		public async Task CreatePaymentStatus(PaymentStatus item) => _repository.Create(item);
 
-		public void DeletePaymentStatus(PaymentStatus item) => _repository.Remove(item);
+		public async Task DeletePaymentStatus(PaymentStatus item) => _repository.Remove(item);
 
 		public PaymentStatus? GetPaymentStatusById(int id)
 		{
@@ -30,10 +30,10 @@ namespace SomeShop.Services
 			return result.FirstOrDefault();
 		}
 
-		public IEnumerable<PaymentStatus> GetPaymentStatuses() => _repository.Get();
+		public async Task<IEnumerable<PaymentStatus>> GetPaymentStatuses() => _repository.Get();
 
-		public IEnumerable<PaymentStatus> GetPaymentStatuses(Expression<Func<PaymentStatus, bool>> predicate) => _repository.Get(predicate);
+		public async Task<IEnumerable<PaymentStatus>> GetPaymentStatuses(Expression<Func<PaymentStatus, bool>> predicate) => _repository.Get(predicate);
 
-		public void UpdatePaymentStatus(PaymentStatus item) => _repository.Update(item);
+		public async Task UpdatePaymentStatus(PaymentStatus item) => _repository.Update(item);
 	}
 }

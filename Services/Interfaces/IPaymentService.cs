@@ -6,19 +6,11 @@ namespace SomeShop.Services.Interfaces
     public interface IPaymentService
     {
         // Manage Payment
-        void CreatePayment(Payment item);
-        IEnumerable<Payment> GetPayments();
-        IEnumerable<Payment> GetPayments(Expression<Func<Payment, bool>> predicate);
-        Payment? GetPaymentByOrderId(int id);
-        void UpdatePayment(Payment item);
-        void DeletePayment(Payment item);
+        Task CreatePaymentAsync(Payment item, CancellationToken cancellationToken);
+        Task<async Task<IEnumerable<Payment>>> GetPaymentsAsync(CancellationToken cancellationToken);
+        Task<async Task<IEnumerable<Payment>>> GetPaymentsAsync(Expression<Func<Payment, bool>> predicate, CancellationToken cancellationToken);
+        Payment? GetPaymentByOrderIdAsync(int id, CancellationToken cancellationToken);
+        Task UpdatePaymentAsync(Payment item, CancellationToken cancellationToken);
+        Task DeletePaymentAsync(Payment item, CancellationToken cancellationToken);
     }
 }
-/*
-void Create%EntityType%(%EntityType% item);
-IEnumerable<%EntityType%> Get%EntityType%s();
-IEnumerable<%EntityType%> Get%EntityType%s(Expression<Func<%EntityType%, bool>> predicate);
-%EntityType%? Get%EntityType%ById(int id);
-void Update%EntityType%(%EntityType% item);
-void Delete%EntityType%(%EntityType% item);
- */

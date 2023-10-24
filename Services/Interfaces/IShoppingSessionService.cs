@@ -5,12 +5,11 @@ namespace SomeShop.Services.Interfaces
 {
 	public interface IShoppingSessionService
     {
-        // Manage Session
-        void CreateShoppingSession(ShoppingSession session);
-        IEnumerable<ShoppingSession> GetShoppingSessions();
-        IEnumerable<ShoppingSession> GetShoppingSessions(Expression<Func<ShoppingSession, bool>> predicate);
-        ShoppingSession? GetSessionById(int id);
-        void UpdateShoppingSession(ShoppingSession session);
-        void DeleteShoppingSession(ShoppingSession session);
+        Task CreateShoppingSessionAsync(ShoppingSession session, CancellationToken cancellationToken);
+        Task<async Task<IEnumerable<ShoppingSession>>> GetShoppingSessionsAsync(CancellationToken cancellationToken);
+        Task<async Task<IEnumerable<ShoppingSession>>> GetShoppingSessionsAsync(Expression<Func<ShoppingSession, bool>> predicate, CancellationToken cancellationToken);
+        ShoppingSession? GetSessionByIdAsync(int id, CancellationToken cancellationToken);
+        Task UpdateShoppingSessionAsync(ShoppingSession session, CancellationToken cancellationToken);
+        Task DeleteShoppingSessionAsync(ShoppingSession session, CancellationToken cancellationToken);
     }
 }

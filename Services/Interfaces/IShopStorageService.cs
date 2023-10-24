@@ -6,13 +6,13 @@ namespace SomeShop.Services.Interfaces
 	public interface IShopStorageService
     {
         // Manage ShopStorage
-        void CreateShopStorage(ShopStorage item);
-        IEnumerable<ShopStorage> GetShopStorages();
-        IEnumerable<ShopStorage> GetShopStorages(Expression<Func<ShopStorage, bool>> predicate);
-        IEnumerable<ShopStorage> GetStorageByShopId(int id);
-        IEnumerable<ShopStorage> GetStorageByProductId(int id);
-        ShopStorage? GetStorageByKey(int shopId, int productId);
-        void UpdateShopStorage(ShopStorage item);
-        void DeleteShopStorage(ShopStorage item);
+        Task CreateShopStorageAsync(ShopStorage item, CancellationToken cancellationToken);
+        Task<async Task<IEnumerable<ShopStorage>>> GetShopStoragesAsync(CancellationToken cancellationToken);
+        Task<async Task<IEnumerable<ShopStorage>>> GetShopStoragesAsync(Expression<Func<ShopStorage, bool>> predicate, CancellationToken cancellationToken);
+        Task<async Task<IEnumerable<ShopStorage>>> GetStorageByShopIdAsync(int id, CancellationToken cancellationToken);
+        Task<async Task<IEnumerable<ShopStorage>>> GetStorageByProductIdAsync(int id, CancellationToken cancellationToken);
+        ShopStorage? GetStorageByKeyAsync(int shopId, int productId, CancellationToken cancellationToken);
+        Task UpdateShopStorageAsync(ShopStorage item, CancellationToken cancellationToken);
+        Task DeleteShopStorageAsync(ShopStorage item, CancellationToken cancellationToken);
     }
 }

@@ -6,11 +6,11 @@ namespace SomeShop.Services.Interfaces
 {
     public interface IOrderService
     {
-        void CreateOrder(Order order);
-        IEnumerable<Order> GetOrders();
-        IEnumerable<Order> GetOrders(Expression<Func<Order, bool>> predicate);
-        Order? GetOrderById(int id);
-        void UpdateOrder(Order item);
-        void DeleteOrder(Order item);
+        Task CreateOrderAsync(Order order, CancellationToken cancellationToken);
+        Task<IEnumerable<Order>> GetOrdersAsync(CancellationToken cancellationToken);
+        Task<IEnumerable<Order>> GetOrdersAsync(Expression<Func<Order, bool>> predicate, CancellationToken cancellationToken);
+        Task<Order?> GetOrderByIdAsync(int id, CancellationToken cancellationToken);
+        Task UpdateOrderAsync(Order item, CancellationToken cancellationToken);
+        Task DeleteOrderAsync(Order item, CancellationToken cancellationToken);
     }
 }

@@ -15,24 +15,93 @@ namespace SomeShop.Services
             _repository = repository;
         }
 
-		public void CreateClient(Client client) => _repository.Create(client);
-
-		public void DeleteClient(Client client) => _repository.Remove(client);
-
-		public Client? GetClientById(int id)
+		public async Task CreateClientAsync(Client client, CancellationToken cancellationToken)
         {
-            var result = _repository.Get(x => x.Id == id);
+            cancellationToken.ThrowIfCancellationRequested();
 
-            if (result is null) throw new NullReferenceException();
-
-			if (result.Count() > 1) throw new KeyNotUniqueException();
-
-			return result.FirstOrDefault();
+			try
+			{
+				await _repository.CreateAsync(client, cancellationToken);
+			}
+			catch (OperationCanceledException)
+			{
+				throw;
+			}
         }
 
-		public IEnumerable<Client> GetClients() => _repository.Get();
+		public async Task DeleteClientAsync(Client client, CancellationToken cancellationToken)
+		{
+			cancellationToken.ThrowIfCancellationRequested();
 
-		public IEnumerable<Client> GetClients(Expression<Func<Client, bool>> predicate) => _repository.Get(predicate);
-		public void UpdateClient(Client client) => _repository.Update(client);
+			try
+			{
+				await _repository.RemoveAsync(client, cancellationToken);
+			}
+			catch (OperationCanceledException)
+			{
+				throw;
+			}
+		}
+
+		public async Task<Client?>> GetClientByIdAsync(int id, CancellationToken cancellationToken)
+        {
+			cancellationToken.ThrowIfCancellationRequested();
+
+			try
+			{
+				var result = await _repository.GetAsync(x => x.Id == id, cancellationToken);
+
+				if (result is null) throw new NullReferenceException();
+
+				if (result.Count() > 1) throw new KeyNotUniqueException();
+
+				return result.FirstOrDefault();
+			}
+			catch (OperationCanceledException)
+			{
+				throw;
+			}
+        }
+
+		public async Task<async Task<IEnumerable<Client>>> GetClientsAsync(CancellationToken cancellationToken)
+		{
+			cancellationToken.ThrowIfCancellationRequested();
+
+			try
+			{
+				return await _repository.GetAsync(cancellationToken);
+			}
+			catch (OperationCanceledException)
+			{
+				throw;
+			}
+		}
+
+		public async Task<async Task<IEnumerable<Client>>> GetClientsAsync(Expression<Func<Client, bool>> predicate, 
+			CancellationToken cancellationToken)
+		{
+			cancellationToken.ThrowIfCancellationRequested();
+
+			try
+			{
+				return await _repository.GetAsync(predicate, cancellationToken);
+			}
+			catch (Exception)
+			{
+				throw;
+			}
+		}
+
+		public async Task UpdateClient(Client client, CancellationToken cancellationToken)
+		{
+			try
+			{
+				await _repository.UpdateAsync(client, cancellationToken);
+			}
+			catch (OperationCanceledException)
+			{
+				throw;
+			}
+		}
 	}
 }

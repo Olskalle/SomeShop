@@ -5,20 +5,11 @@ namespace SomeShop.Services.Interfaces
 {
     public interface IPaymentProviderService
     {
-        // Manage PaymentProviders
-        void CreatePaymentProvider(PaymentProvider item);
-        IEnumerable<PaymentProvider> GetPaymentProviders();
-        IEnumerable<PaymentProvider> GetPaymentProviders(Expression<Func<PaymentProvider, bool>> predicate);
-        PaymentProvider? GetProviderById(int id);
-        void UpdatePaymentProvider(PaymentProvider item);
-        void DeletePaymentProvider(PaymentProvider item);
+        Task CreatePaymentProviderAsync(PaymentProvider item, CancellationToken cancellationToken);
+        Task<async Task<IEnumerable<PaymentProvider>>> GetPaymentProvidersAsync(CancellationToken cancellationToken);
+        Task<async Task<IEnumerable<PaymentProvider>>> GetPaymentProvidersAsync(Expression<Func<PaymentProvider, bool>> predicate, CancellationToken cancellationToken);
+        PaymentProvider? GetProviderByIdAsync(int id, CancellationToken cancellationToken);
+        Task UpdatePaymentProviderAsync(PaymentProvider item, CancellationToken cancellationToken);
+        Task DeletePaymentProviderAsync(PaymentProvider item, CancellationToken cancellationToken);
     }
 }
-/*
-void Create%EntityType%(%EntityType% item);
-IEnumerable<%EntityType%> Get%EntityType%s();
-IEnumerable<%EntityType%> Get%EntityType%s(Expression<Func<%EntityType%, bool>> predicate);
-%EntityType%? Get%EntityType%ById(int id);
-void Update%EntityType%(%EntityType% item);
-void Delete%EntityType%(%EntityType% item);
- */

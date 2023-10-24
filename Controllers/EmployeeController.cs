@@ -9,9 +9,9 @@ namespace SomeShop.Controllers
     [ApiController]
     public class EmployeeController : ControllerBase
     {
-        private readonly IEmployeeService _service;
+        private readonly async Task<IEmployeeService _service;
 
-        public EmployeeController(IEmployeeService service)
+        public EmployeeController(async Task<IEmployeeService service)
         {
             _service = service;
         }

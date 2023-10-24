@@ -33,14 +33,14 @@ namespace SomeShop
 		public DbSet<PaymentProvider> PaymentProviders { get; set; }
 		public DbSet<PaymentStatus> PaymentStatuses { get; set; }
 
-		protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+		protected override async Task OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 		{
 			optionsBuilder.UseInMemoryDatabase("InMemory");
 			//optionsBuilder.UseNpgsql("Host=localhost;Port=5433;Database=SomeShop;Username=postgres;Password=12345qwerty");
 			//base.OnConfiguring(optionsBuilder);
 		}
 
-		protected override void OnModelCreating(ModelBuilder modelBuilder)
+		protected override async Task OnModelCreating(ModelBuilder modelBuilder)
 		{
 			//base.OnModelCreating(modelBuilder);
 			modelBuilder.Entity<CartItem>().HasKey(c => new {c.SessionId, c.ProductId});
@@ -58,7 +58,7 @@ namespace SomeShop
 			SeedDatabase(modelBuilder);
 		}
 
-		private void SeedDatabase(ModelBuilder modelBuilder)
+		private async Task SeedDatabase(ModelBuilder modelBuilder)
 		{
 			modelBuilder.Entity<Category>()
 				.HasData(new Category[] {

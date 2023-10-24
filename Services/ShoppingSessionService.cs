@@ -15,9 +15,9 @@ namespace SomeShop.Services
 			_repository = repository;
 		}
 
-		public void CreateShoppingSession(ShoppingSession item) => _repository.Create(item);
+		public async Task CreateShoppingSession(ShoppingSession item) => _repository.Create(item);
 
-		public void DeleteShoppingSession(ShoppingSession item) => _repository.Remove(item);
+		public async Task DeleteShoppingSession(ShoppingSession item) => _repository.Remove(item);
 
 		public ShoppingSession? GetSessionById(int id)
 		{
@@ -30,10 +30,10 @@ namespace SomeShop.Services
 			return result.FirstOrDefault();
 		}
 
-		public IEnumerable<ShoppingSession> GetShoppingSessions() => _repository.Get();
+		public async Task<IEnumerable<ShoppingSession>> GetShoppingSessions() => _repository.Get();
 
-		public IEnumerable<ShoppingSession> GetShoppingSessions(Expression<Func<ShoppingSession, bool>> predicate) => _repository.Get(predicate);
+		public async Task<IEnumerable<ShoppingSession>> GetShoppingSessions(Expression<Func<ShoppingSession, bool>> predicate) => _repository.Get(predicate);
 
-		public void UpdateShoppingSession(ShoppingSession item) => _repository.Update(item);
+		public async Task UpdateShoppingSession(ShoppingSession item) => _repository.Update(item);
 	}
 }

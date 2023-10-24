@@ -15,9 +15,9 @@ namespace SomeShop.Services
 			_repository = repository;
 		}
 
-		public void CreateProduct(Product item) => _repository.Create(item);
+		public async Task CreateProduct(Product item) => _repository.Create(item);
 
-		public void DeleteProduct(Product item) => _repository.Remove(item);
+		public async Task DeleteProduct(Product item) => _repository.Remove(item);
 
 		public Product? GetProductById(int id)
 		{
@@ -30,10 +30,10 @@ namespace SomeShop.Services
 			return result.FirstOrDefault();
 		}
 
-		public IEnumerable<Product> GetProducts() => _repository.Get();
+		public async Task<IEnumerable<Product>> GetProducts() => _repository.Get();
 
-		public IEnumerable<Product> GetProducts(Expression<Func<Product, bool>> predicate) => _repository.Get(predicate);
+		public async Task<IEnumerable<Product>> GetProducts(Expression<Func<Product, bool>> predicate) => _repository.Get(predicate);
 
-		public void UpdateProduct(Product item) => _repository.Update(item);
+		public async Task UpdateProduct(Product item) => _repository.Update(item);
 	}
 }

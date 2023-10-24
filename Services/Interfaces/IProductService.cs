@@ -6,11 +6,11 @@ namespace SomeShop.Services.Interfaces
 	public interface IProductService
     {
         // Manage Products
-        void CreateProduct(Product item);
-        IEnumerable<Product> GetProducts();
-        IEnumerable<Product> GetProducts(Expression<Func<Product, bool>> predicate);
-        Product? GetProductById(int id);
-        void UpdateProduct(Product item);
-        void DeleteProduct(Product item);
+        Task CreateProductAsync(Product item, CancellationToken cancellationToken);
+        Task<async Task<IEnumerable<Product>>> GetProductsAsync(CancellationToken cancellationToken);
+        Task<async Task<IEnumerable<Product>>> GetProductsAsync(Expression<Func<Product, bool>> predicate, CancellationToken cancellationToken);
+        Product? GetProductByIdAsync(int id, CancellationToken cancellationToken);
+        Task UpdateProductAsync(Product item, CancellationToken cancellationToken);
+        Task DeleteProductAsync(Product item, CancellationToken cancellationToken);
     }
 }

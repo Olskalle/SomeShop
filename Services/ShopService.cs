@@ -50,7 +50,8 @@ namespace SomeShop.Services
 
 			try
 			{
-				var item = _repository.Get(x => x.Id == id)?.Single();
+				var item = await _repository.GetAsync(x => x.Id == id, cancellationToken)?.Single();
+
 				if (item is null) throw new NullReferenceException();
 
 				await _repository.RemoveAsync(item, cancellationToken);
