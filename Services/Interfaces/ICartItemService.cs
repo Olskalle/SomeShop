@@ -7,12 +7,13 @@ namespace SomeShop.Services.Interfaces
     {
         // Manage CartItem
         Task CreateCartItemAsync(CartItem item, CancellationToken cancellationToken);
-        Task<async Task<IEnumerable<CartItem>>> GetCartItemsAsync(CancellationToken cancellationToken);
-        Task<async Task<IEnumerable<CartItem>>> GetCartItemsAsync(Expression<Func<CartItem, bool>> predicate, CancellationToken cancellationToken);
-        Task<async Task<IEnumerable<CartItem>>> GetItemsBySessionIdAsync(int sessionId, CancellationToken cancellationToken);
-        Task<async Task<IEnumerable<CartItem>>> GetItemsByProductIdAsync(int productId, CancellationToken cancellationToken);
-        Task<CartItem?>> GetItemByKeyAsync(int sessionId, int productId, CancellationToken cancellationToken);
+        Task<IEnumerable<CartItem>> GetCartItemsAsync(CancellationToken cancellationToken);
+        Task<IEnumerable<CartItem>> GetCartItemsAsync(Expression<Func<CartItem, bool>> predicate, CancellationToken cancellationToken);
+        Task<IEnumerable<CartItem>> GetItemsBySessionIdAsync(int sessionId, CancellationToken cancellationToken);
+        Task<IEnumerable<CartItem>> GetItemsByProductIdAsync(int productId, CancellationToken cancellationToken);
+        Task<CartItem?> GetItemByKeyAsync(int sessionId, int productId, CancellationToken cancellationToken);
         Task UpdateCartItemAsync(CartItem item, CancellationToken cancellationToken);
         Task DeleteCartItemAsync(CartItem item, CancellationToken cancellationToken);
+        Task DeleteCartItemByKeyAsync(int sessionId, int productId, CancellationToken cancellationToken);
     }
 }

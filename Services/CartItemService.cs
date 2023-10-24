@@ -40,7 +40,23 @@ namespace SomeShop.Services
 			}
 		}
 
-		public async Task<async Task<IEnumerable<CartItem>>> GetCartItemsAsync(CancellationToken cancellationToken)
+		public async Task DeleteCartItemByKeyAsync(int sessionId, int productId, CancellationToken cancellationToken)
+		{
+			cancellationToken.ThrowIfCancellationRequested();
+
+			try
+			{
+				await _repository.DeleteAsync(
+					x => x.SessionId == sessionId && x.ProductId == productId, 
+					cancellationToken);
+			}
+			catch (OperationCanceledException)
+			{
+				throw;
+			}
+		}
+
+		public async Task<IEnumerable<CartItem>> GetCartItemsAsync(CancellationToken cancellationToken)
 		{
 			cancellationToken.ThrowIfCancellationRequested();
 
@@ -54,7 +70,7 @@ namespace SomeShop.Services
 			}
 		}
 
-		public async Task<async Task<IEnumerable<CartItem>>> GetCartItemsAsync(Expression<Func<CartItem, bool>> predicate, 
+		public async Task<IEnumerable<CartItem>> GetCartItemsAsync(Expression<Func<CartItem, bool>> predicate, 
 			CancellationToken cancellationToken)
 		{
 			cancellationToken.ThrowIfCancellationRequested();
@@ -69,7 +85,7 @@ namespace SomeShop.Services
 			}
 		}
 
-		public async Task<CartItem?>> GetItemByKeyAsync(int sessionId, int productId, CancellationToken cancellationToken)
+		public async Task<CartItem?> GetItemByKeyAsync(int sessionId, int productId, CancellationToken cancellationToken)
 		{
 			cancellationToken.ThrowIfCancellationRequested();
 			try
@@ -91,7 +107,7 @@ namespace SomeShop.Services
 			}
 		}
 
-		public async Task<async Task<IEnumerable<CartItem>>> GetItemsByProductIdAsync(int id, CancellationToken cancellationToken)
+		public async Task<IEnumerable<CartItem>> GetItemsByProductIdAsync(int id, CancellationToken cancellationToken)
 		{
 			cancellationToken.ThrowIfCancellationRequested();
 
@@ -105,7 +121,7 @@ namespace SomeShop.Services
 			}
 		}
 
-		public async Task<async Task<IEnumerable<CartItem>>> GetItemsBySessionIdAsync(int id, CancellationToken cancellationToken)
+		public async Task<IEnumerable<CartItem>> GetItemsBySessionIdAsync(int id, CancellationToken cancellationToken)
 		{
 			cancellationToken.ThrowIfCancellationRequested();
 

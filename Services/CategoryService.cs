@@ -40,7 +40,23 @@ namespace SomeShop.Services
 			}
 		}
 
-		public async Task<async Task<IEnumerable<Category>>> GetCategoriesAsync(CancellationToken cancellationToken)
+		public async Task DeleteCategoryByIdAsync(int id, CancellationToken cancellationToken)
+		{
+			cancellationToken.ThrowIfCancellationRequested();
+
+			try
+			{
+				await _repository.DeleteAsync(
+					x => x.Id == id, 
+					cancellationToken);
+			}
+			catch (OperationCanceledException)
+			{
+				throw;
+			}
+		}
+
+		public async Task<IEnumerable<Category>> GetCategoriesAsync(CancellationToken cancellationToken)
 		{
 			cancellationToken.ThrowIfCancellationRequested();
 
@@ -54,7 +70,7 @@ namespace SomeShop.Services
 			}
 		}
 
-		public async Task<async Task<IEnumerable<Category>>> GetCategoriesAsync(Expression<Func<Category, bool>> predicate, 
+		public async Task<IEnumerable<Category>> GetCategoriesAsync(Expression<Func<Category, bool>> predicate, 
 			CancellationToken cancellationToken)
 		{
 			cancellationToken.ThrowIfCancellationRequested();
@@ -69,7 +85,7 @@ namespace SomeShop.Services
 			}
 		}
 
-		public async Task<Category?>> GetCategoryByIdAsync(int id, CancellationToken cancellationToken)
+		public async Task<Category> GetCategoryByIdAsync(int id, CancellationToken cancellationToken)
 		{
 			cancellationToken.ThrowIfCancellationRequested();
 

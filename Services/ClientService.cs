@@ -43,7 +43,23 @@ namespace SomeShop.Services
 			}
 		}
 
-		public async Task<Client?>> GetClientByIdAsync(int id, CancellationToken cancellationToken)
+		public async Task DeleteClientByIdAsync(int id, CancellationToken cancellationToken)
+		{
+			cancellationToken.ThrowIfCancellationRequested();
+
+			try
+			{
+				await _repository.DeleteAsync(
+					x => x.Id == id,
+					cancellationToken);
+			}
+			catch (OperationCanceledException)
+			{
+				throw;
+			}
+		}
+
+		public async Task<Client?> GetClientByIdAsync(int id, CancellationToken cancellationToken)
         {
 			cancellationToken.ThrowIfCancellationRequested();
 
@@ -63,7 +79,7 @@ namespace SomeShop.Services
 			}
         }
 
-		public async Task<async Task<IEnumerable<Client>>> GetClientsAsync(CancellationToken cancellationToken)
+		public async Task<IEnumerable<Client>> GetClientsAsync(CancellationToken cancellationToken)
 		{
 			cancellationToken.ThrowIfCancellationRequested();
 
@@ -77,7 +93,7 @@ namespace SomeShop.Services
 			}
 		}
 
-		public async Task<async Task<IEnumerable<Client>>> GetClientsAsync(Expression<Func<Client, bool>> predicate, 
+		public async Task<IEnumerable<Client>> GetClientsAsync(Expression<Func<Client, bool>> predicate, 
 			CancellationToken cancellationToken)
 		{
 			cancellationToken.ThrowIfCancellationRequested();
@@ -92,7 +108,7 @@ namespace SomeShop.Services
 			}
 		}
 
-		public async Task UpdateClient(Client client, CancellationToken cancellationToken)
+		public async Task UpdateClientAsync(Client client, CancellationToken cancellationToken)
 		{
 			try
 			{

@@ -18,7 +18,7 @@ namespace SomeShop
 			builder.Services.AddScoped<IOrderItemService, OrderItemService>()
 				.AddScoped<ICategoryService, CategoryService>()
 				.AddScoped<IClientService, ClientService>()
-				.AddScoped<async Task<IEmployeeService, EmployeeService>()
+				.AddScoped<IEmployeeService, EmployeeService>()
 				.AddScoped<IManufacturerService, ManufacturerService>()
 				.AddScoped<IOrderService, OrderService>()
 				.AddScoped<IOrderItemService, OrderItemService>()

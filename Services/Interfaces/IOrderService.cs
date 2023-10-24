@@ -12,5 +12,6 @@ namespace SomeShop.Services.Interfaces
         Task<Order?> GetOrderByIdAsync(int id, CancellationToken cancellationToken);
         Task UpdateOrderAsync(Order item, CancellationToken cancellationToken);
         Task DeleteOrderAsync(Order item, CancellationToken cancellationToken);
+        Task DeleteOrderByIdAsync(int id, CancellationToken cancellationToken);
     }
 }

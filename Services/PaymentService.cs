@@ -15,24 +15,110 @@ namespace SomeShop.Services
 			_repository = repository;
 		}
 
-		public async Task CreatePayment(Payment item) => _repository.Create(item);
-
-		public async Task DeletePayment(Payment item) => _repository.Remove(item);
-
-		public Payment? GetPaymentByOrderId(int id)
+		public async Task CreatePaymentAsync(Payment item, CancellationToken cancellationToken)
 		{
-			var result = _repository.Get(x => x.OrderId == id);
+			cancellationToken.ThrowIfCancellationRequested();
 
-			if (result is null) throw new NullReferenceException();
-
-			if (result.Count() > 1) throw new KeyNotUniqueException();
-
-			return result.FirstOrDefault();
+			try
+			{
+				await _repository.CreateAsync(item, cancellationToken);
+			}
+			catch (OperationCanceledException)
+			{
+				throw;
+			}
 		}
 
-		public async Task<IEnumerable<Payment>> GetPayments() => _repository.Get();
-		public async Task<IEnumerable<Payment>> GetPayments(Expression<Func<Payment, bool>> predicate) => _repository.Get(predicate);
+		public async Task DeletePaymentAsync(Payment item, CancellationToken cancellationToken)
+		{
+			cancellationToken.ThrowIfCancellationRequested();
 
-		public async Task UpdatePayment(Payment item) => _repository.Update(item);
+			try
+			{
+				await _repository.RemoveAsync(item, cancellationToken);
+			}
+			catch (OperationCanceledException)
+			{
+				throw;
+			}
+		}
+
+		public async Task DeletePaymentByOrderIdAsync(int id, CancellationToken cancellationToken)
+		{
+			cancellationToken.ThrowIfCancellationRequested();
+
+			try
+			{
+				await _repository.DeleteAsync(
+					x => x.OrderId == id,
+					cancellationToken);
+			}
+			catch (OperationCanceledException)
+			{
+				throw;
+			}
+		}
+
+		public async Task<Payment?> GetPaymentByOrderIdAsync(int id, CancellationToken cancellationToken)
+		{
+			cancellationToken.ThrowIfCancellationRequested();
+
+			try
+			{
+				var result = await _repository.GetAsync(x => x.OrderId == id, cancellationToken);
+
+				if (result is null) throw new NullReferenceException();
+
+				if (result.Count() > 1) throw new KeyNotUniqueException();
+
+				return result.FirstOrDefault();
+			}
+			catch (OperationCanceledException)
+			{
+				throw;
+			}
+		}
+
+		public async Task<IEnumerable<Payment>> GetPaymentsAsync(CancellationToken cancellationToken)
+		{
+			cancellationToken.ThrowIfCancellationRequested();
+
+			try
+			{
+				return await _repository.GetAsync(cancellationToken);
+			}
+			catch (OperationCanceledException)
+			{
+				throw;
+			}
+		}
+
+		public async Task<IEnumerable<Payment>> GetPaymentsAsync(Expression<Func<Payment, bool>> predicate, CancellationToken cancellationToken)
+		{
+			cancellationToken.ThrowIfCancellationRequested();
+
+			try
+			{
+				return await _repository.GetAsync(predicate, cancellationToken);
+			}
+			catch (OperationCanceledException)
+			{
+				throw;
+			}
+		}
+
+		public async Task UpdatePaymentAsync(Payment item, CancellationToken cancellationToken)
+		{
+			cancellationToken.ThrowIfCancellationRequested();
+
+			try
+			{
+				await _repository.UpdateAsync(item, cancellationToken);
+			}
+			catch (OperationCanceledException)
+			{
+				throw;
+			}
+		}
 	}
 }

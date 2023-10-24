@@ -18,7 +18,7 @@ namespace SomeShop.Controllers
 		}
 
 		[HttpGet("all")]
-		public async Task<IActionResult>> GetAllShops(CancellationToken cancellationToken)
+		public async Task<IActionResult> GetAllShops(CancellationToken cancellationToken)
 		{
 			var result = await _service.GetShopsAsync(cancellationToken);
 
@@ -30,7 +30,7 @@ namespace SomeShop.Controllers
 			return Ok(result);
 		}
 		[HttpGet("{id}")]
-		public async Task<IActionResult>> GetShop(int id, CancellationToken cancellationToken)
+		public async Task<IActionResult> GetShop(int id, CancellationToken cancellationToken)
 		{
 			var result = await _service.GetShopByIdAsync(id, cancellationToken);
 

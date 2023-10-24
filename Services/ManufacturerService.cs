@@ -42,7 +42,23 @@ namespace SomeShop.Services
 			}
 		}
 
-		public async Task<Manufacturer?>> GetManufacturerByIdAsync(int id, CancellationToken cancellatioonToken)
+		public async Task DeleteManufacturerByIdAsync(int id, CancellationToken cancellationToken)
+		{
+			cancellationToken.ThrowIfCancellationRequested();
+
+			try
+			{
+				await _repository.DeleteAsync(
+					x => x.Id == id,
+					cancellationToken);
+			}
+			catch (OperationCanceledException)
+			{
+				throw;
+			}
+		}
+
+		public async Task<Manufacturer> GetManufacturerByIdAsync(int id, CancellationToken cancellatioonToken)
         {
 			cancellatioonToken.ThrowIfCancellationRequested();
 			try
@@ -61,7 +77,7 @@ namespace SomeShop.Services
 			}
 		}
 
-		public async Task<async Task<IEnumerable<Manufacturer>>> GetManufacturersAsync(CancellationToken cancellatioonToken)
+		public async Task<IEnumerable<Manufacturer>> GetManufacturersAsync(CancellationToken cancellatioonToken)
 		{
 			cancellatioonToken.ThrowIfCancellationRequested();
 
@@ -75,7 +91,7 @@ namespace SomeShop.Services
 			}
 		}
 
-		public async Task<async Task<IEnumerable<Manufacturer>>> GetManufacturersAsync(Expression<Func<Manufacturer, bool>> predicate, CancellationToken cancellatioonToken)
+		public async Task<IEnumerable<Manufacturer>> GetManufacturersAsync(Expression<Func<Manufacturer, bool>> predicate, CancellationToken cancellatioonToken)
 		{
 			cancellatioonToken.ThrowIfCancellationRequested();
 

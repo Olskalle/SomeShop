@@ -45,7 +45,7 @@ namespace SomeShop.Services
 			}
 		}
 
-		public async Task<async Task<IEnumerable<OrderItem>>> GetItemsByOrderIdAsync(int id, CancellationToken cancellationToken)
+		public async Task<IEnumerable<OrderItem>> GetItemsByOrderIdAsync(int id, CancellationToken cancellationToken)
 		{
 			cancellationToken.ThrowIfCancellationRequested();
 
@@ -59,7 +59,7 @@ namespace SomeShop.Services
 			}
 		}
 
-		public async Task<async Task<IEnumerable<OrderItem>>> GetOrderItemsAsync(CancellationToken cancellationToken)
+		public async Task<IEnumerable<OrderItem>> GetOrderItemsAsync(CancellationToken cancellationToken)
 		{
 			cancellationToken.ThrowIfCancellationRequested();
 
@@ -73,7 +73,7 @@ namespace SomeShop.Services
 			}
 		}
 
-		public async Task<async Task<IEnumerable<OrderItem>>> GetOrderItemsAsync(Expression<Func<OrderItem, bool>> predicate, CancellationToken cancellationToken)
+		public async Task<IEnumerable<OrderItem>> GetOrderItemsAsync(Expression<Func<OrderItem, bool>> predicate, CancellationToken cancellationToken)
 		{
 			cancellationToken.ThrowIfCancellationRequested();
 
@@ -87,7 +87,7 @@ namespace SomeShop.Services
 			}
 		}
 
-		public async Task<async Task<IEnumerable<OrderItem>>> GetItemsByProductIdAsync(int id, CancellationToken cancellationToken)
+		public async Task<IEnumerable<OrderItem>> GetItemsByProductIdAsync(int id, CancellationToken cancellationToken)
 		{
 			cancellationToken.ThrowIfCancellationRequested();
 
@@ -115,7 +115,7 @@ namespace SomeShop.Services
 			}
 		}
 
-		public async Task<OrderItem?>> GetItemByKeyAsync(int orderId, int productId, CancellationToken cancellationToken)
+		public async Task<OrderItem> GetItemByKeyAsync(int orderId, int productId, CancellationToken cancellationToken)
 		{
 			cancellationToken.ThrowIfCancellationRequested();
 
@@ -130,6 +130,23 @@ namespace SomeShop.Services
 				if (result.Count() > 1) throw new KeyNotUniqueException();
 
 				return result.FirstOrDefault();
+			}
+			catch (OperationCanceledException)
+			{
+				throw;
+			}
+		}
+
+		public async Task DeleteOrderItemByKeyAsync(int orderId, int productId, CancellationToken cancellationToken)
+		{
+			cancellationToken.ThrowIfCancellationRequested();
+
+			try
+			{
+				await _repository.DeleteAsync(
+					x => x.OrderId == orderId && x.ProductId == productId,
+					cancellationToken);
+
 			}
 			catch (OperationCanceledException)
 			{
