@@ -2,7 +2,7 @@
 {
 	public static class Extensions
 	{
-		public static async Task<T> RunWithCancellationHandling<T>(this Func<Task<T>> body, CancellationToken cancellationToken)
+		private static async Task<T> WithCancellationHandling<T>(this CancellationToken cancellationToken, Func<Task<T>> body)
 		{
 			if (cancellationToken.IsCancellationRequested)
 			{
@@ -18,7 +18,7 @@
 				throw;
 			}
 		}
-		public static async Task RunWithCancellationHandling(this Func<Task> body, CancellationToken cancellationToken)
+		private static async Task WithCancellationHandling(this CancellationToken cancellationToken, Func<Task> body)
 		{
 			if (cancellationToken.IsCancellationRequested)
 			{
@@ -34,7 +34,7 @@
 				throw;
 			}
 		}
-		public static async Task RunWithCancellationHandling(this Task task, CancellationToken cancellationToken)
+		private static async Task WithCancellationHandling(this CancellationToken cancellationToken, Task task)
 		{
 			if (cancellationToken.IsCancellationRequested)
 			{
