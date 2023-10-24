@@ -17,65 +17,90 @@ namespace SomeShop.Controllers
 		}
 
 		[HttpGet("all")]
-		public IActionResult GetAllPaymentProviders()
+		public async Task<IActionResult> GetAllPaymentProviders(CancellationToken cancellationToken)
 		{
-			var result = _service.GetPaymentProviders();
-
-			if (result is null || result.Count() <= 0)
+			try
 			{
-				return NoContent();
-			}
+				var result = await _service.GetPaymentProvidersAsync(cancellationToken);
 
-			return Ok(result);
+				if (result is null || result.Count() <= 0)
+				{
+					return NoContent();
+				}
+
+				return Ok(result);
+			}
+			catch (OperationCanceledException)
+			{
+				return BadRequest();
+			}
 		}
 		[HttpGet("{id}")]
-		public IActionResult GetPaymentProvider(int id)
+		public async Task<IActionResult> GetPaymentProvider(int id, CancellationToken cancellationToken)
 		{
-			var result = _service.GetProviderById(id);
+			try
+			{
+				var result = await _service.GetProviderByIdAsync(id, cancellationToken);
 
-			if (result is null) return NotFound();
+				if (result is null) return NotFound();
 
-			return Ok(result);
+				return Ok(result);
+			}
+			catch (OperationCanceledException)
+			{
+				return BadRequest();
+			}
 		}
 
 		[HttpPost("add")]
-		public IActionResult AddPaymentProvider(PaymentProvider? item)
+		public async Task<IActionResult> AddPaymentProvider(PaymentProvider? item, CancellationToken cancellationToken)
 		{
 			if (item is null) return BadRequest();
 
-			_service.CreatePaymentProvider(item);
-			return Ok();
+			try
+			{
+				await _service.CreatePaymentProviderAsync(item, cancellationToken);
+				return Ok();
+			}
+			catch (OperationCanceledException)
+			{
+				return BadRequest();
+			}
 		}
 
 		[HttpPut("update/{id}")]
-		public IActionResult UpdatePaymentProvider(int id, PaymentProvider? item)
+		public async Task<IActionResult> UpdatePaymentProvider(int id, PaymentProvider? item, CancellationToken cancellationToken)
 		{
-
 			if (item is null || id != item.Id) return BadRequest();
 
-			if (_service.GetProviderById(id) != null)
+			try
 			{
-				_service.UpdatePaymentProvider(item);
+				var toUpdate = await _service.GetProviderByIdAsync(id, cancellationToken);
+				if (toUpdate != null)
+				{
+					await _service.UpdatePaymentProviderAsync(item, cancellationToken);
+					return Ok();
+				}
+				return NotFound();
 			}
-			else
+			catch (OperationCanceledException)
 			{
-				_service.CreatePaymentProvider(item);
+				return BadRequest();
 			}
-
-			return Ok();
 		}
 
 		[HttpDelete("delete/{id}")]
-		public IActionResult DeletePaymentProvider(int id)
+		public async Task<IActionResult> DeletePaymentProvider(int id, CancellationToken cancellationToken)
 		{
-			var itemToDelete = _service.GetProviderById(id);
-			if (itemToDelete != null)
+			try
 			{
-				_service.DeletePaymentProvider(itemToDelete);
-				return Ok();
+				await _service.DeletePaymentProviderByIdAsync(id, cancellationToken);
+				return NoContent();
 			}
-
-			return NotFound();
+			catch (OperationCanceledException)
+			{
+				return BadRequest();
+			}
 		}
 	}
 }

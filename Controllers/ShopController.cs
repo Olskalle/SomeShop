@@ -20,23 +20,37 @@ namespace SomeShop.Controllers
 		[HttpGet("all")]
 		public async Task<IActionResult> GetAllShops(CancellationToken cancellationToken)
 		{
-			var result = await _service.GetShopsAsync(cancellationToken);
-
-			if (result is null || result.Count() <= 0)
+			try
 			{
-				return NoContent();
-			}
+				var result = await _service.GetShopsAsync(cancellationToken);
 
-			return Ok(result);
+				if (result is null || result.Count() <= 0)
+				{
+					return NoContent();
+				}
+
+				return Ok(result);
+			}
+			catch (OperationCanceledException)
+			{
+				return BadRequest();
+			}
 		}
 		[HttpGet("{id}")]
 		public async Task<IActionResult> GetShop(int id, CancellationToken cancellationToken)
 		{
-			var result = await _service.GetShopByIdAsync(id, cancellationToken);
+			try
+			{
+				var result = await _service.GetShopByIdAsync(id, cancellationToken);
 
-			if (result is null) return NotFound();
+				if (result is null) return NotFound();
 
-			return Ok(result);
+				return Ok(result);
+			}
+			catch (OperationCanceledException)
+			{
+				return BadRequest();
+			}
 		}
 
 		[HttpPost("add")]
@@ -44,8 +58,15 @@ namespace SomeShop.Controllers
 		{
 			if (item is null) return BadRequest();
 
-			await _service.CreateShopAsync(item, cancellationToken);
-			return Ok();
+			try
+			{
+				await _service.CreateShopAsync(item, cancellationToken);
+				return Ok();
+			}
+			catch (OperationCanceledException)
+			{
+				return BadRequest();
+			}
 		}
 
 		[HttpPut("update/{id}")]
@@ -53,32 +74,34 @@ namespace SomeShop.Controllers
 		{
 			if (item is null || id != item.Id) return BadRequest();
 
-			if (await _service.GetShopByIdAsync(id, cancellationToken) != null)
+			try
 			{
-				await _service.UpdateShopAsync(item, cancellationToken);
+				var toUpdate = await _service.GetShopByIdAsync(id, cancellationToken);
+				if (toUpdate != null)
+				{
+					await _service.UpdateShopAsync(item, cancellationToken);
+					return Ok();
+				}
+				return NotFound();
 			}
-			else
+			catch (OperationCanceledException)
 			{
-				await _service.CreateShopAsync(item, cancellationToken);
+				return BadRequest();
 			}
-
-			return Ok();
 		}
 
 		[HttpDelete("delete/{id}")]
 		public async Task<IActionResult> DeleteShop(int id, CancellationToken cancellationToken)
 		{
-			//var shopToDelete = _service.GetShopById(id);
-			//if (shopToDelete != null)
-			//{
-			//	_service.DeleteShop(shopToDelete);
-			//	return Ok();
-			//}
-
-			//return NotFound();
-
-			await _service.DeleteShopByIdAsync(id, cancellationToken);
-			return NoContent();
+			try
+			{
+				await _service.DeleteShopByIdAsync(id, cancellationToken);
+				return NoContent();
+			}
+			catch (OperationCanceledException)
+			{
+				return BadRequest();
+			}
 		}
 	}
 }

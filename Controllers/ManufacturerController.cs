@@ -16,66 +16,91 @@ namespace SomeShop.Controllers
             _service = service;
         }
 
-        [HttpGet("all")]
-        public IActionResult GetAllManufacturers()
-        {
-            var result = _service.GetManufacturers();
+		[HttpGet("all")]
+		public async Task<IActionResult> GetAllManufacturers(CancellationToken cancellationToken)
+		{
+			try
+			{
+				var result = await _service.GetManufacturersAsync(cancellationToken);
 
-            if (result is null || result.Count() <= 0)
-            {
-                return NoContent();
-            }
+				if (result is null || result.Count() <= 0)
+				{
+					return NoContent();
+				}
 
-            return Ok(result);
-        }
-        [HttpGet("{id}")]
-        public IActionResult GetManufacturer(int id)
-        {
-            var result = _service.GetManufacturerById(id);
+				return Ok(result);
+			}
+			catch (OperationCanceledException)
+			{
+				return BadRequest();
+			}
+		}
+		[HttpGet("{id}")]
+		public async Task<IActionResult> GetManufacturer(int id, CancellationToken cancellationToken)
+		{
+			try
+			{
+				var result = await _service.GetManufacturerByIdAsync(id, cancellationToken);
 
-            if (result is null) return NotFound();
+				if (result is null) return NotFound();
 
-            return Ok(result);
-        }
+				return Ok(result);
+			}
+			catch (OperationCanceledException)
+			{
+				return BadRequest();
+			}
+		}
 
-        [HttpPost("add")]
-        public IActionResult AddManufacturer(Manufacturer? item)
-        {
+		[HttpPost("add")]
+		public async Task<IActionResult> AddManufacturer(Manufacturer? item, CancellationToken cancellationToken)
+		{
 			if (item is null) return BadRequest();
 
-			_service.CreateManufacturer(item);
-            return Ok();
-        }
+			try
+			{
+				await _service.CreateManufacturerAsync(item, cancellationToken);
+				return Ok();
+			}
+			catch (OperationCanceledException)
+			{
+				return BadRequest();
+			}
+		}
 
-        [HttpPut("update/{id}")]
-        public IActionResult UpdateManufacturer(int id, Manufacturer? item)
-        {
+		[HttpPut("update/{id}")]
+		public async Task<IActionResult> UpdateManufacturer(int id, Manufacturer? item, CancellationToken cancellationToken)
+		{
+			if (item is null || id != item.Id) return BadRequest();
 
-            if (item is null || id != item.Id) return BadRequest();
+			try
+			{
+				var toUpdate = await _service.GetManufacturerByIdAsync(id, cancellationToken);
+				if (toUpdate != null)
+				{
+					await _service.UpdateManufacturerAsync(item, cancellationToken);
+					return Ok();
+				}
+				return NotFound();
+			}
+			catch (OperationCanceledException)
+			{
+				return BadRequest();
+			}
+		}
 
-            if (_service.GetManufacturerById(id) != null)
-            {
-                _service.UpdateManufacturer(item);
-            }
-            else
-            {
-                _service.CreateManufacturer(item);
-            }
-
-            return Ok();
-        }
-
-        [HttpDelete("delete/{id}")]
-        public IActionResult DeleteManufacturer(int id)
-        {
-            var itemToDelete = _service.GetManufacturerById(id);
-            if (itemToDelete != null)
-            {
-                _service.DeleteManufacturer(itemToDelete);
-                return Ok();
-            }
-
-            return NotFound();
-        }
-    }
+		[HttpDelete("delete/{id}")]
+		public async Task<IActionResult> DeleteManufacturer(int id, CancellationToken cancellationToken)
+		{
+			try
+			{
+				await _service.DeleteManufacturerByIdAsync(id, cancellationToken);
+				return NoContent();
+			}
+			catch (OperationCanceledException)
+			{
+				return BadRequest();
+			}
+		}
+	}
 }

@@ -17,65 +17,90 @@ namespace SomeShop.Controllers
 		}
 
 		[HttpGet("all")]
-		public IActionResult GetAllCategorys()
+		public async Task<IActionResult> GetAllCategories(CancellationToken cancellationToken)
 		{
-			var result = _service.GetCategories();
-
-			if (result is null || result.Count() <= 0)
+			try
 			{
-				return NoContent();
-			}
+				var result = await _service.GetCategoriesAsync(cancellationToken);
 
-			return Ok(result);
+				if (result is null || result.Count() <= 0)
+				{
+					return NoContent();
+				}
+
+				return Ok(result); 
+			}
+			catch (OperationCanceledException)
+			{
+				return BadRequest();
+			}
 		}
 		[HttpGet("{id}")]
-		public IActionResult GetCategory(int id)
+		public async Task<IActionResult> GetCategory(int id, CancellationToken cancellationToken)
 		{
-			var result = _service.GetCategoryById(id);
+			try
+			{
+				var result = await _service.GetCategoryByIdAsync(id, cancellationToken);
 
-			if (result is null) return NotFound();
+				if (result is null) return NotFound();
 
-			return Ok(result);
+				return Ok(result); 
+			}
+			catch (OperationCanceledException)
+			{
+				return BadRequest();
+			}
 		}
 
 		[HttpPost("add")]
-		public IActionResult AddCategory(Category? item)
+		public async Task<IActionResult> AddCategory(Category? item, CancellationToken cancellationToken)
 		{
 			if (item is null) return BadRequest();
 
-			_service.CreateCategory(item);
-			return Ok();
+			try
+			{
+				await _service.CreateCategoryAsync(item, cancellationToken);
+				return Ok(); 
+			}
+			catch (OperationCanceledException)
+			{
+				return BadRequest();
+			}
 		}
 
 		[HttpPut("update/{id}")]
-		public IActionResult UpdateCategory(int id, Category? item)
+		public async Task<IActionResult> UpdateCategory(int id, Category? item, CancellationToken cancellationToken)
 		{
-
 			if (item is null || id != item.Id) return BadRequest();
 
-			if (_service.GetCategoryById(id) != null)
+			try
 			{
-				_service.UpdateCategory(item);
+				var toUpdate = await _service.GetCategoryByIdAsync(id, cancellationToken);
+				if (toUpdate != null)
+				{
+					await _service.UpdateCategoryAsync(item, cancellationToken);
+					return Ok();
+				}
+				return NotFound(); 
 			}
-			else
+			catch (OperationCanceledException)
 			{
-				_service.CreateCategory(item);
+				return BadRequest();
 			}
-
-			return Ok();
 		}
 
 		[HttpDelete("delete/{id}")]
-		public IActionResult DeleteCategory(int id)
+		public async Task<IActionResult> DeleteCategory(int id, CancellationToken cancellationToken)
 		{
-			var itemToDelete = _service.GetCategoryById(id);
-			if (itemToDelete != null)
+			try
 			{
-				_service.DeleteCategory(itemToDelete);
-				return Ok();
+				await _service.DeleteCategoryByIdAsync(id, cancellationToken);
+				return NoContent();
 			}
-
-			return NotFound();
+			catch (OperationCanceledException)
+			{
+				return BadRequest();
+			}
 		}
 	}
 }

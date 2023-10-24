@@ -18,85 +18,130 @@ namespace SomeShop.Controllers
 		}
 
 		[HttpGet("all")]
-		public IActionResult GetAllCartItems()
+		public async Task<IActionResult> GetAllCartItems(CancellationToken cancellationToken)
 		{
-			var result = _service.GetCartItems();
-
-			if (result is null || !result.Any())
+			try
 			{
-				return NoContent();
-			}
+				var result = await _service.GetCartItemsAsync(cancellationToken);
 
-			return Ok(result);
+				if (result is null || !result.Any())
+				{
+					return NoContent();
+				}
+
+				return Ok(result); 
+			}
+			catch (OperationCanceledException)
+			{
+				return BadRequest();
+			}
 		}
 		[HttpGet("session/{id}")]
-		public IActionResult GetItemsBySession(int id)
+		public async Task<IActionResult> GetItemsBySession(int id, CancellationToken cancellationToken)
 		{
-			var result = _service.GetItemsBySessionId(id);
+			try
+			{
+				var result = await _service.GetItemsBySessionIdAsync(id, cancellationToken);
 
-			if (result is null || !result.Any()) return NoContent();
+				if (result is null || !result.Any()) return NoContent();
 
-			return Ok(result);
+				return Ok(result); 
+			}
+			catch (OperationCanceledException)
+			{
+				return BadRequest();
+			}
 		}
 
 		[HttpGet("product/{id}")]
-		public IActionResult GetItemsByProduct(int id)
+		public async Task<IActionResult> GetItemsByProduct(int id, CancellationToken cancellationToken)
 		{
-			var result = _service.GetItemsByProductId(id);
+			try
+			{
+				var result = await _service.GetItemsByProductIdAsync(id, cancellationToken);
 
-			if (result is null || !result.Any()) return NoContent();
+				if (result is null || !result.Any()) return NoContent();
 
-			return Ok(result);
+				return Ok(result); 
+			}
+			catch (OperationCanceledException)
+			{
+				return BadRequest();
+			}
 		}
 
 		[HttpGet("{sessionId}&{productId}")]
-		public IActionResult GetItemByKey(int sessionId, int productId)
+		public async Task<IActionResult> GetItemByKey(int sessionId, int productId, CancellationToken cancellationToken)
 		{
-			var result = _service.GetItemByKey(sessionId, productId);
+			try
+			{
+				var result = await _service.GetItemByKeyAsync(sessionId, productId, cancellationToken);
 
-			if (result is null) return NotFound();
+				if (result is null) return NotFound();
 
-			return Ok(result);
+				return Ok(result); 
+			}
+			catch (OperationCanceledException)
+			{
+				return BadRequest();
+			}
 		}
 
 		[HttpPost("add")]
-		public IActionResult AddCartItem(CartItem? item)
+		public async Task<IActionResult> AddCartItem(CartItem? item, CancellationToken cancellationToken)
 		{
 			if (item is null) return BadRequest();
 
-			_service.CreateCartItem(item);
-			return Ok();
+			try
+			{
+				await _service.CreateCartItemAsync(item, cancellationToken);
+				return Ok(); 
+			}
+			catch (OperationCanceledException)
+			{
+				return BadRequest();
+			}
 		}
 
 		[HttpPut("update/{sessionId}&{productId}")]
-		public IActionResult UpdateCartItem(int sessionId, int productId, CartItem? item)
+		public async Task<IActionResult> UpdateCartItem(int sessionId, int productId, CartItem? item, CancellationToken cancellationToken)
 		{
-
 			if (item is null || sessionId != item.SessionId || productId != item.ProductId)
 			{
 				return BadRequest();
 			}
 
-			if (_service.GetItemByKey(sessionId, productId) != null)
+			try
 			{
-				_service.UpdateCartItem(item);
-				return Ok();
-			}
+				var toUpdate = await _service.GetItemByKeyAsync(sessionId, productId, cancellationToken);
 
-			return NotFound();
+				if (toUpdate != null)
+				{
+					await _service.UpdateCartItemAsync(item, cancellationToken);
+					return Ok();
+				}
+
+				return NotFound(); 
+			}
+			catch (OperationCanceledException)
+			{
+				return BadRequest();
+			}
 		}
 
 		[HttpDelete("delete/{sessionId}&{productId}")]
-		public IActionResult DeleteCartItem(int sessionId, int productId)
+		public async Task<IActionResult> DeleteCartItem(int sessionId, int productId, CancellationToken cancellationToken)
 		{
-			var cartItemToDelete = _service.GetItemByKey(sessionId, productId);
-			if (cartItemToDelete != null)
+			try
 			{
-				_service.DeleteCartItem(cartItemToDelete);
-				return Ok();
-			}
+				await _service.DeleteCartItemByKeyAsync(sessionId, productId, cancellationToken);
 
-			return NotFound();
+				return NoContent();
+			}
+			catch (OperationCanceledException)
+			{
+				return BadRequest();
+			}
 		}
 	}
 }

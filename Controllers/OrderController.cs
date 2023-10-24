@@ -16,66 +16,91 @@ namespace SomeShop.Controllers
             _service = service;
         }
 
-        [HttpGet("all")]
-        public IActionResult GetAllOrders()
-        {
-            var result = _service.GetOrders();
+		[HttpGet("all")]
+		public async Task<IActionResult> GetAllOrders(CancellationToken cancellationToken)
+		{
+			try
+			{
+				var result = await _service.GetOrdersAsync(cancellationToken);
 
-            if (result is null || result.Count() <= 0)
-            {
-                return NoContent();
-            }
+				if (result is null || result.Count() <= 0)
+				{
+					return NoContent();
+				}
 
-            return Ok(result);
-        }
-        [HttpGet("{id}")]
-        public IActionResult GetOrder(int id)
-        {
-            var result = _service.GetOrderById(id);
+				return Ok(result);
+			}
+			catch (OperationCanceledException)
+			{
+				return BadRequest();
+			}
+		}
+		[HttpGet("{id}")]
+		public async Task<IActionResult> GetOrder(int id, CancellationToken cancellationToken)
+		{
+			try
+			{
+				var result = await _service.GetOrderByIdAsync(id, cancellationToken);
 
-            if (result is null) return NotFound();
+				if (result is null) return NotFound();
 
-            return Ok(result);
-        }
+				return Ok(result);
+			}
+			catch (OperationCanceledException)
+			{
+				return BadRequest();
+			}
+		}
 
-        [HttpPost("add")]
-        public IActionResult AddOrder(Order? item)
-        {
+		[HttpPost("add")]
+		public async Task<IActionResult> AddOrder(Order? item, CancellationToken cancellationToken)
+		{
 			if (item is null) return BadRequest();
 
-			_service.CreateOrder(item);
-            return Ok();
-        }
+			try
+			{
+				await _service.CreateOrderAsync(item, cancellationToken);
+				return Ok();
+			}
+			catch (OperationCanceledException)
+			{
+				return BadRequest();
+			}
+		}
 
-        [HttpPut("update/{id}")]
-        public IActionResult UpdateOrder(int id, Order? item)
-        {
+		[HttpPut("update/{id}")]
+		public async Task<IActionResult> UpdateOrder(int id, Order? item, CancellationToken cancellationToken)
+		{
+			if (item is null || id != item.Id) return BadRequest();
 
-            if (item is null || id != item.Id) return BadRequest();
+			try
+			{
+				var toUpdate = await _service.GetOrderByIdAsync(id, cancellationToken);
+				if (toUpdate != null)
+				{
+					await _service.UpdateOrderAsync(item, cancellationToken);
+					return Ok();
+				}
+				return NotFound();
+			}
+			catch (OperationCanceledException)
+			{
+				return BadRequest();
+			}
+		}
 
-            if (_service.GetOrderById(id) != null)
-            {
-                _service.UpdateOrder(item);
-            }
-            else
-            {
-                _service.CreateOrder(item);
-            }
-
-            return Ok();
-        }
-
-        [HttpDelete("delete/{id}")]
-        public IActionResult DeleteOrder(int id)
-        {
-            var itemToDelete = _service.GetOrderById(id);
-            if (itemToDelete != null)
-            {
-                _service.DeleteOrder(itemToDelete);
-                return Ok();
-            }
-
-            return NotFound();
-        }
-    }
+		[HttpDelete("delete/{id}")]
+		public async Task<IActionResult> DeleteOrder(int id, CancellationToken cancellationToken)
+		{
+			try
+			{
+				await _service.DeleteOrderByIdAsync(id, cancellationToken);
+				return NoContent();
+			}
+			catch (OperationCanceledException)
+			{
+				return BadRequest();
+			}
+		}
+	}
 }

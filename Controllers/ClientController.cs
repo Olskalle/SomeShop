@@ -16,66 +16,91 @@ namespace SomeShop.Controllers
             _service = service;
         }
 
-        [HttpGet("all")]
-        public IActionResult GetAllClients()
-        {
-            var result = _service.GetClients();
+		[HttpGet("all")]
+		public async Task<IActionResult> GetAllClients(CancellationToken cancellationToken)
+		{
+			try
+			{
+				var result = await _service.GetClientsAsync(cancellationToken);
 
-            if (result is null || result.Count() <= 0)
-            {
-                return NoContent();
-            }
+				if (result is null || result.Count() <= 0)
+				{
+					return NoContent();
+				}
 
-            return Ok(result);
-        }
-        [HttpGet("{id}")]
-        public IActionResult GetClient(int id)
-        {
-            var result = _service.GetClientById(id);
+				return Ok(result);
+			}
+			catch (OperationCanceledException)
+			{
+				return BadRequest();
+			}
+		}
+		[HttpGet("{id}")]
+		public async Task<IActionResult> GetClient(int id, CancellationToken cancellationToken)
+		{
+			try
+			{
+				var result = await _service.GetClientByIdAsync(id, cancellationToken);
 
-            if (result is null) return NotFound();
+				if (result is null) return NotFound();
 
-            return Ok(result);
-        }
+				return Ok(result);
+			}
+			catch (OperationCanceledException)
+			{
+				return BadRequest();
+			}
+		}
 
-        [HttpPost("add")]
-        public IActionResult AddClient(Client? item)
-        {
+		[HttpPost("add")]
+		public async Task<IActionResult> AddClient(Client? item, CancellationToken cancellationToken)
+		{
 			if (item is null) return BadRequest();
 
-			_service.CreateClient(item);
-            return Ok();
-        }
+			try
+			{
+				await _service.CreateClientAsync(item, cancellationToken);
+				return Ok();
+			}
+			catch (OperationCanceledException)
+			{
+				return BadRequest();
+			}
+		}
 
-        [HttpPut("update/{id}")]
-        public IActionResult UpdateClient(int id, Client? item)
-        {
+		[HttpPut("update/{id}")]
+		public async Task<IActionResult> UpdateClient(int id, Client? item, CancellationToken cancellationToken)
+		{
+			if (item is null || id != item.Id) return BadRequest();
 
-            if (item is null || id != item.Id) return BadRequest();
+			try
+			{
+				var toUpdate = await _service.GetClientByIdAsync(id, cancellationToken);
+				if (toUpdate != null)
+				{
+					await _service.UpdateClientAsync(item, cancellationToken);
+					return Ok();
+				}
+				return NotFound();
+			}
+			catch (OperationCanceledException)
+			{
+				return BadRequest();
+			}
+		}
 
-            if (_service.GetClientById(id) != null)
-            {
-                _service.UpdateClient(item);
-            }
-            else
-            {
-                _service.CreateClient(item);
-            }
-
-            return Ok();
-        }
-
-        [HttpDelete("delete/{id}")]
-        public IActionResult DeleteClient(int id)
-        {
-            var itemToDelete = _service.GetClientById(id);
-            if (itemToDelete != null)
-            {
-                _service.DeleteClient(itemToDelete);
-                return Ok();
-            }
-
-            return NotFound();
-        }
-    }
+		[HttpDelete("delete/{id}")]
+		public async Task<IActionResult> DeleteClient(int id, CancellationToken cancellationToken)
+		{
+			try
+			{
+				await _service.DeleteClientByIdAsync(id, cancellationToken);
+				return NoContent();
+			}
+			catch (OperationCanceledException)
+			{
+				return BadRequest();
+			}
+		}
+	}
 }
