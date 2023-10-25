@@ -42,20 +42,255 @@ namespace SomeShop
 
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
-			//base.OnModelCreating(modelBuilder);
-			modelBuilder.Entity<CartItem>().HasKey(c => new {c.SessionId, c.ProductId});
-			modelBuilder.Entity<OrderItem>().HasKey(o => new {o.OrderId, o.ProductId});
-			modelBuilder.Entity<ShopStorage>().HasKey(s => new {s.ShopId, s.ProductId});
-
-			modelBuilder.Entity<Employee>().ToTable(t => t.HasCheckConstraint("PhoneNumber", "PhoneNumber LIKE '8%'"));
-			modelBuilder.Entity<Client>().ToTable(t => t.HasCheckConstraint("PhoneNumber", "PhoneNumber LIKE '8%'"));
-			modelBuilder.Entity<Shop>().ToTable(t => t.HasCheckConstraint("PhoneNumber", "PhoneNumber LIKE '8%'"));
-
-			modelBuilder.Entity<ShopStorage>().ToTable(t => t.HasCheckConstraint("Quantity", "Quantity >= 0"));
-			modelBuilder.Entity<CartItem>().ToTable(t => t.HasCheckConstraint("Quantity", "Quantity >= 1"));
-			modelBuilder.Entity<OrderItem>().ToTable(t => t.HasCheckConstraint("Quantity", "Quantity >= 1"));
+			ConfigureEntities(modelBuilder);
+			ConfigureRelations(modelBuilder);
 
 			SeedDatabase(modelBuilder);
+		}
+
+		private void ConfigureEntities(ModelBuilder modelBuilder)
+		{
+			modelBuilder.Entity<CartItem>(c =>
+			{
+				c.HasKey(x => new { x.SessionId, x.Product });
+				c.Property(x => x.SessionId).IsRequired();
+				c.Property(x => x.ShoppingSession).IsRequired();
+				c.Property(x => x.Product).IsRequired();
+				c.Property(x => x.ProductId).IsRequired();
+			});
+			modelBuilder.Entity<CartItem>()
+				.ToTable(t => t.HasCheckConstraint("Quantity", "Quantity >= 1"));
+
+			modelBuilder.Entity<Category>(c =>
+			{
+				c.HasKey(x => x.Id);
+				c.Property(x => x.Id).ValueGeneratedOnAdd();
+				c.Property(x => x.Name).IsRequired();
+			});
+
+			modelBuilder.Entity<Client>(c =>
+			{
+				c.HasKey(x => x.Id);
+				c.Property(x => x.Id).ValueGeneratedOnAdd();
+				c.Property(x => x.Name).IsRequired();
+				c.Property(x => x.PhoneNumber).HasMaxLength(15);
+			});
+			modelBuilder.Entity<Client>()
+				.ToTable(t => t.HasCheckConstraint("PhoneNumber", "PhoneNumber LIKE '8%'"));
+
+			modelBuilder.Entity<Employee>(e =>
+			{
+				e.HasKey(x => x.Id);
+				e.Property(x => x.Id).ValueGeneratedOnAdd();
+				e.Property(x => x.Name).IsRequired();
+				e.Property(x => x.Shop).IsRequired();
+				e.Property(x => x.ShopId).IsRequired();
+				e.Property(x => x.PhoneNumber).HasMaxLength(15);
+			});
+			modelBuilder.Entity<Employee>()
+				.ToTable(t => t.HasCheckConstraint("PhoneNumber", "PhoneNumber LIKE '8%'"));
+
+			modelBuilder.Entity<Manufacturer>(m =>
+			{
+				m.HasKey(x => x.Id);
+				m.Property(x => x.Id).ValueGeneratedOnAdd();
+				m.Property(x => x.Name).IsRequired();
+			});
+
+			modelBuilder.Entity<Order>(o =>
+			{
+				o.HasKey(x => x.Id);
+				o.Property(x => x.Id).ValueGeneratedOnAdd();
+
+				o.Property(x => x.Client).IsRequired();
+				o.Property(x => x.ClientId).IsRequired();
+				o.Property(x => x.OrderItems).IsRequired();
+				o.Property(x => x.CreationDate).IsRequired();
+				o.Property(x => x.Shop).IsRequired();
+				o.Property(x => x.ShopId).IsRequired();
+				o.Property(x => x.Status).IsRequired();
+			});
+
+			modelBuilder.Entity<OrderItem>(i =>
+			{
+				i.HasKey(x => new { x.OrderId, x.ProductId });
+				i.Property(x => x.Order).IsRequired();
+				i.Property(x => x.OrderId).IsRequired();
+				i.Property(x => x.Product).IsRequired();
+				i.Property(x => x.ProductId).IsRequired();
+			});
+			modelBuilder.Entity<OrderItem>()
+				.ToTable(t => t.HasCheckConstraint("Quantity", "Quantity >= 1"));
+
+			modelBuilder.Entity<OrderStatus>(s =>
+			{
+				s.HasKey(x => x.Id);
+				s.Property(x => x.Id).ValueGeneratedOnAdd();
+				s.Property(x => x.Name).IsRequired();
+			});
+
+			modelBuilder.Entity<Payment>(p =>
+			{
+				p.HasKey(x => x.OrderId);
+				p.Property(x => x.OrderId).IsRequired();
+				p.Property(x => x.Order).IsRequired();
+				p.Property(x => x.ProviderId).IsRequired();
+				p.Property(x => x.Provider).IsRequired();
+				p.Property(x => x.StatusId).IsRequired();
+				p.Property(x => x.Status).IsRequired();
+			});
+
+			modelBuilder.Entity<PaymentProvider>(p =>
+			{
+				p.HasKey(x => x.Id);
+				p.Property(x => x.Id).ValueGeneratedOnAdd();
+				p.Property(x => x.Name).IsRequired();
+			});
+
+			modelBuilder.Entity<PaymentStatus>(s =>
+			{
+				s.HasKey(x => x.Id);
+				s.Property(x => x.Id).ValueGeneratedOnAdd();
+				s.Property(x => x.Name).IsRequired();
+			});
+
+			modelBuilder.Entity<Product>(p =>
+			{
+				p.HasKey(x => x.Id);
+				p.Property(x => x.Id).ValueGeneratedOnAdd();
+				p.Property(x => x.Name).IsRequired();
+				p.Property(x => x.Categories).IsRequired();
+				p.Property(x => x.ManufacturerId).IsRequired();
+				p.Property(x => x.Manufacturer).IsRequired();
+			});
+
+			modelBuilder.Entity<Shop>(s =>
+			{
+				s.HasKey(x => x.Id);
+				s.Property(x => x.Id).ValueGeneratedOnAdd();
+				s.Property(x => x.Address).IsRequired();
+			});
+			modelBuilder.Entity<Shop>()
+				.ToTable(t => t.HasCheckConstraint("PhoneNumber", "PhoneNumber LIKE '8%'"));
+
+			modelBuilder.Entity<ShoppingSession>(s =>
+			{
+				s.HasKey(x => x.Id);
+				s.Property(x => x.Id).ValueGeneratedOnAdd();
+				s.Property(x => x.Products).IsRequired();
+				s.Property(x => x.ClientId).IsRequired();
+				s.Property(x => x.Client).IsRequired();
+			});
+
+			modelBuilder.Entity<ShopStorage>(s =>
+			{
+				s.HasKey(x => new { x.ShopId, x.ProductId });
+				s.Property(x => x.ShopId).IsRequired();
+				s.Property(x => x.Shop).IsRequired();
+				s.Property(x => x.ProductId).IsRequired();
+				s.Property(x => x.Product).IsRequired();
+			});
+			modelBuilder.Entity<ShopStorage>()
+				.ToTable(t => t.HasCheckConstraint("Quantity", "Quantity >= 0"));
+		}
+
+		private void ConfigureRelations(ModelBuilder modelBuilder)
+		{
+			modelBuilder.Entity<Product>(p =>
+			{
+				p.HasOne(p => p.Manufacturer)
+					.WithMany(m => m.Products)
+					.HasForeignKey(p => p.ManufacturerId)
+					.IsRequired();
+
+				p.HasMany(x => x.Categories)
+					.WithMany(x => x.Products)
+					.UsingEntity(j => j.ToTable("ProductCategory"));
+
+				p.HasMany(p => p.Orders)
+					.WithMany(o => o.Products)
+					.UsingEntity<OrderItem>(
+						j => j.HasOne(i => i.Order)
+							.WithMany(o => o.OrderItems)
+							.HasForeignKey(i => i.OrderId),
+						j => j.HasOne(i => i.Product)
+							.WithMany(p => p.OrderItems)
+							.HasForeignKey(i => i.ProductId)
+					);
+
+				p.HasMany(p => p.ShoppingSessions)
+					.WithMany(s => s.Products)
+					.UsingEntity<CartItem>(
+						j => j.HasOne(i => i.ShoppingSession)
+							.WithMany(s => s.CartItems)
+							.HasForeignKey(i => i.SessionId),
+						j => j.HasOne(i => i.Product)
+							.WithMany(p => p.CartItems)
+							.HasForeignKey(i => i.ProductId)
+					);
+
+				p.HasMany(p => p.Shops)
+					.WithMany(s => s.Products)
+					.UsingEntity<ShopStorage>(
+						j => j.HasOne(j => j.Shop)
+							.WithMany(s => s.ShopStorages)
+							.HasForeignKey(j => j.ShopId),
+						j => j.HasOne(j => j.Product)
+							.WithMany(p => p.ShopStorages)
+							.HasForeignKey(j => j.ProductId)
+					);
+			});
+
+			modelBuilder.Entity<Order>(o =>
+			{
+				o.HasOne(x => x.Client)
+					.WithMany(c => c.Orders)
+					.HasForeignKey(x => x.ClientId);
+
+				o.HasOne(x => x.Shop)
+					.WithMany(s => s.Orders)
+					.HasForeignKey(x => x.ShopId);
+
+				o.HasOne(x => x.Employee)
+					.WithMany(e => e.Orders)
+					.HasForeignKey(x => x.EmployeeId);
+
+				o.HasOne(x => x.Status)
+					.WithMany()
+					.HasForeignKey(x => x.StatusId);
+
+				o.HasOne(x => x.Payment)
+					.WithOne(p => p.Order);
+			});
+
+			modelBuilder.Entity<Payment>(p =>
+			{
+				p.HasOne(x => x.Order)
+					.WithOne(o => o.Payment)
+					.HasForeignKey<Payment>(x => x.OrderId);
+
+				p.HasOne(x => x.Status)
+					.WithMany()
+					.HasForeignKey(x => x.StatusId);
+
+				p.HasOne(x => x.Provider)
+					.WithMany()
+					.HasForeignKey(x => x.ProviderId);
+			});
+
+			modelBuilder.Entity<Employee>(e =>
+			{
+				e.HasOne(x => x.Shop)
+					.WithMany(s => s.Employees)
+					.HasForeignKey(x => x.ShopId);
+			});
+
+			modelBuilder.Entity<ShoppingSession>(s =>
+			{
+				s.HasOne(x => x.Client)
+					.WithMany(c => c.Sessions)
+					.HasForeignKey(x => x.ClientId);
+			});
 		}
 
 		private void SeedDatabase(ModelBuilder modelBuilder)
@@ -68,10 +303,11 @@ namespace SomeShop
 					new Category() { Id = 4, Name = "Hiking", Products = new() }
 				});
 
-			modelBuilder.Entity<Manufacturer>().HasData(
-				new Manufacturer() { Id = 1, Name = "Adidas"},
-				new Manufacturer() { Id = 2, Name = "China-Super"},
-				new Manufacturer() { Id = 3, Name = "Nike"}
+			modelBuilder.Entity<Manufacturer>()
+				.HasData(
+					new Manufacturer() { Id = 1, Name = "Adidas"},
+					new Manufacturer() { Id = 2, Name = "China-Super"},
+					new Manufacturer() { Id = 3, Name = "Nike"}
 				);
 		}
 	}

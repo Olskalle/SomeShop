@@ -6,11 +6,12 @@ namespace SomeShop.Models
 {
 	public class Shop
 	{
-		[Key,
-		DatabaseGenerated(DatabaseGeneratedOption.Identity)]
 		public int Id { get; set; }
-		[Required] public string Address { get; set; } = null!;
-		[MaxLength(32)]
+		public string Address { get; set; } = null!;
 		public string? PhoneNumber { get; set; }
+		public List<Product> Products { get; set; } = null!;
+		public List<ShopStorage> ShopStorages { get; set; } = null!;
+		public List<Order> Orders { get; set; } = null!;
+		public List<Employee> Employees { get; set; } = null!;
 	}
 }

@@ -6,13 +6,18 @@ namespace SomeShop.Models
 {
 	public class Product
 	{
-		[Key,
-		DatabaseGenerated(DatabaseGeneratedOption.Identity)]
 		public int Id { get; set; }
-		[Required] public string Name { get; set; } = null!;
+		public string Name { get; set; } = null!;
 		public string? Description { get; set; }
-		[Required] public List<Category> Categories { get; set; } = null!;
-		[Required] public Manufacturer Manufacturer { get; set; } = null!;
+		public List<Category> Categories { get; set; } = null!;
+		public int ManufacturerId { get; set; }
+		public Manufacturer Manufacturer { get; set; } = null!;
 		public decimal Rating { get; set; } = 0;
+		public List<Order> Orders { get; set; } = null!;
+		public List<OrderItem> OrderItems { get; set; } = null!;
+		public List<CartItem> CartItems { get; set; } = null!;
+		public List<ShoppingSession> ShoppingSessions { get; set; } = null!;
+		public List<Shop> Shops { get; set; } = null!;
+		public List<ShopStorage> ShopStorages { get; set; } = null!;
 	}
 }

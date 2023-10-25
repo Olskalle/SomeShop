@@ -5,19 +5,19 @@ namespace SomeShop.Models
 {
 	public class Order
 	{
-		[Key, 
-		DatabaseGenerated(DatabaseGeneratedOption.Identity)]
 		public int Id { get; set; }
-		[Required] public int ClientId { get; set; }
-		[Required] public virtual Client Client { get; set; } = null!;
-		[Required] public List<OrderItem> OrderItems { get; set; } = null!;
-		[Required] public DateTime CreationDate { get; set; } = DateTime.UtcNow;
+		public int ClientId { get; set; }
+		public virtual Client Client { get; set; } = null!;
+		public List<OrderItem> OrderItems { get; set; } = null!;
+		public List<Product> Products { get; set; } = null!;
+		public DateTime CreationDate { get; set; } = DateTime.UtcNow;
 		public DateTime ReceiveDate { get; set; }
-		[Required] public int ShopId { get; set; }
-		[Required] public Shop Shop { get; set; } = null!;
+		public int ShopId { get; set; }
+		public Shop Shop { get; set; } = null!;
 		public int EmployeeId { get; set; }
 		public virtual Employee? Employee { get; set; }
 		public virtual Payment? Payment { get; set; }
-		[Required] public OrderStatus Status { get; set; } = null!;
+		public int StatusId { get; set; }
+		public OrderStatus Status { get; set; } = null!;
 	}
 }
