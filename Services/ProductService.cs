@@ -19,106 +19,57 @@ namespace SomeShop.Services
 		{
 			cancellationToken.ThrowIfCancellationRequested();
 
-			try
-			{
-				await _repository.CreateAsync(item, cancellationToken); 
-			}
-			catch (OperationCanceledException)
-			{
-				throw;
-			}
+			await _repository.CreateAsync(item, cancellationToken);
 		}
 
 		public async Task DeleteProductAsync(Product item, CancellationToken cancellationToken)
 		{
 			cancellationToken.ThrowIfCancellationRequested();
 
-			try
-			{
-				await _repository.RemoveAsync(item, cancellationToken); 
-			}
-			catch (OperationCanceledException)
-			{
-				throw;
-			}
+			await _repository.RemoveAsync(item, cancellationToken);
 		}
 
 		public async Task DeleteProductByIdAsync(int id, CancellationToken cancellationToken)
 		{
 			cancellationToken.ThrowIfCancellationRequested();
 
-			try
-			{
-				await _repository.DeleteAsync(
-					x => x.Id == id,
-					cancellationToken);
-			}
-			catch (OperationCanceledException)
-			{
-				throw;
-			}
+			await _repository.DeleteAsync(
+				x => x.Id == id,
+				cancellationToken);
 		}
 
 		public async Task<Product?> GetProductByIdAsync(int id, CancellationToken cancellationToken)
 		{
 			cancellationToken.ThrowIfCancellationRequested();
 
-			try
-			{
-				var result = await _repository.GetAsync(x => x.Id == id, cancellationToken);
+			var result = await _repository.GetAsync(x => x.Id == id, cancellationToken);
 
-				if (result is null) throw new NullReferenceException();
+			if (result is null) throw new NullReferenceException();
 
-				if (result.Count() > 1) throw new KeyNotUniqueException();
+			if (result.Count() > 1) throw new KeyNotUniqueException();
 
-				return result.FirstOrDefault();
-			}
-			catch (OperationCanceledException)
-			{
-				throw;
-			}
+			return result.FirstOrDefault();
 		}
 
 		public async Task<IEnumerable<Product>> GetProductsAsync(CancellationToken cancellationToken)
 		{
 			cancellationToken.ThrowIfCancellationRequested();
 
-			try
-			{
-				return await _repository.GetAsync(cancellationToken);
-			}
-			catch (OperationCanceledException)
-			{
-				throw;
-			}
+			return await _repository.GetAsync(cancellationToken);
 		}
 
 		public async Task<IEnumerable<Product>> GetProductsAsync(Expression<Func<Product, bool>> predicate, CancellationToken cancellationToken)
 		{
 			cancellationToken.ThrowIfCancellationRequested();
 
-			try
-			{
-				return await _repository.GetAsync(predicate, cancellationToken);
-			}
-			catch (OperationCanceledException)
-			{
-				throw;
-			}		
+			return await _repository.GetAsync(predicate, cancellationToken);
 		}
 
 		public async Task UpdateProductAsync(Product item, CancellationToken cancellationToken)
 		{
 			cancellationToken.ThrowIfCancellationRequested();
 
-			try
-			{
-				await _repository.UpdateAsync(item, cancellationToken);
-			}
-			catch (OperationCanceledException)
-			{
-				throw;
-			}		
+			await _repository.UpdateAsync(item, cancellationToken);
 		}
 	}
 }

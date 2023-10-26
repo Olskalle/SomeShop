@@ -9,9 +9,9 @@ namespace SomeShop.Models
 		public int Id { get; set; }
 		public string Address { get; set; } = null!;
 		public string? PhoneNumber { get; set; }
-		public List<Product> Products { get; set; } = null!;
-		public List<ShopStorage> ShopStorages { get; set; } = null!;
-		public List<Order> Orders { get; set; } = null!;
-		public List<Employee> Employees { get; set; } = null!;
+		public List<Product> Products { get; set; } = new();
+		public List<ShopStorage> ShopStorages { get; set; } = new();
+		public List<Order> Orders { get; set; } = new();
+		public List<Employee> Employees { get; set; } = new();
 	}
 }

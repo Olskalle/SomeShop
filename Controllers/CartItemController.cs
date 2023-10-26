@@ -20,71 +20,46 @@ namespace SomeShop.Controllers
 		[HttpGet("all")]
 		public async Task<IActionResult> GetAllCartItems(CancellationToken cancellationToken)
 		{
-			try
-			{
-				var result = await _service.GetCartItemsAsync(cancellationToken);
+			var result = await _service.GetCartItemsAsync(cancellationToken);
 
-				if (result is null || !result.Any())
-				{
-					return NoContent();
-				}
-
-				return Ok(result); 
-			}
-			catch (OperationCanceledException)
+			if (result is null || !result.Any())
 			{
-				return BadRequest();
+				return NoContent();
 			}
+
+			return Ok(result);
 		}
 		[HttpGet("session/{id}")]
 		public async Task<IActionResult> GetItemsBySession(int id, CancellationToken cancellationToken)
 		{
-			try
-			{
-				var result = await _service.GetItemsBySessionIdAsync(id, cancellationToken);
 
-				if (result is null || !result.Any()) return NoContent();
+			var result = await _service.GetItemsBySessionIdAsync(id, cancellationToken);
 
-				return Ok(result); 
-			}
-			catch (OperationCanceledException)
-			{
-				return BadRequest();
-			}
+			if (result is null || !result.Any()) return NoContent();
+
+			return Ok(result);
 		}
 
 		[HttpGet("product/{id}")]
 		public async Task<IActionResult> GetItemsByProduct(int id, CancellationToken cancellationToken)
 		{
-			try
-			{
-				var result = await _service.GetItemsByProductIdAsync(id, cancellationToken);
 
-				if (result is null || !result.Any()) return NoContent();
+			var result = await _service.GetItemsByProductIdAsync(id, cancellationToken);
 
-				return Ok(result); 
-			}
-			catch (OperationCanceledException)
-			{
-				return BadRequest();
-			}
+			if (result is null || !result.Any()) return NoContent();
+
+			return Ok(result);
 		}
 
 		[HttpGet("{sessionId}&{productId}")]
 		public async Task<IActionResult> GetItemByKey(int sessionId, int productId, CancellationToken cancellationToken)
 		{
-			try
-			{
-				var result = await _service.GetItemByKeyAsync(sessionId, productId, cancellationToken);
 
-				if (result is null) return NotFound();
+			var result = await _service.GetItemByKeyAsync(sessionId, productId, cancellationToken);
 
-				return Ok(result); 
-			}
-			catch (OperationCanceledException)
-			{
-				return BadRequest();
-			}
+			if (result is null) return NotFound();
+
+			return Ok(result);
 		}
 
 		[HttpPost("add")]
@@ -92,15 +67,9 @@ namespace SomeShop.Controllers
 		{
 			if (item is null) return BadRequest();
 
-			try
-			{
-				await _service.CreateCartItemAsync(item, cancellationToken);
-				return Ok(); 
-			}
-			catch (OperationCanceledException)
-			{
-				return BadRequest();
-			}
+
+			await _service.CreateCartItemAsync(item, cancellationToken);
+			return Ok();
 		}
 
 		[HttpPut("update/{sessionId}&{productId}")]
@@ -111,37 +80,24 @@ namespace SomeShop.Controllers
 				return BadRequest();
 			}
 
-			try
-			{
-				var toUpdate = await _service.GetItemByKeyAsync(sessionId, productId, cancellationToken);
+			var toUpdate = await _service.GetItemByKeyAsync(sessionId, productId, cancellationToken);
 
-				if (toUpdate != null)
-				{
-					await _service.UpdateCartItemAsync(item, cancellationToken);
-					return Ok();
-				}
-
-				return NotFound(); 
-			}
-			catch (OperationCanceledException)
+			if (toUpdate != null)
 			{
-				return BadRequest();
+				await _service.UpdateCartItemAsync(item, cancellationToken);
+				return Ok();
 			}
+
+			return NotFound();
 		}
 
 		[HttpDelete("delete/{sessionId}&{productId}")]
 		public async Task<IActionResult> DeleteCartItem(int sessionId, int productId, CancellationToken cancellationToken)
 		{
-			try
-			{
-				await _service.DeleteCartItemByKeyAsync(sessionId, productId, cancellationToken);
 
-				return NoContent();
-			}
-			catch (OperationCanceledException)
-			{
-				return BadRequest();
-			}
+			await _service.DeleteCartItemByKeyAsync(sessionId, productId, cancellationToken);
+
+			return NoContent();
 		}
 	}
 }

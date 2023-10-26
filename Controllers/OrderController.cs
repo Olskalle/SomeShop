@@ -5,51 +5,39 @@ using SomeShop.Services.Interfaces;
 
 namespace SomeShop.Controllers
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class OrderController : ControllerBase
-    {
-        private readonly IOrderService _service;
+	[Route("api/[controller]")]
+	[ApiController]
+	public class OrderController : ControllerBase
+	{
+		private readonly IOrderService _service;
 
-        public OrderController(IOrderService service)
-        {
-            _service = service;
-        }
+		public OrderController(IOrderService service)
+		{
+			_service = service;
+		}
 
 		[HttpGet("all")]
 		public async Task<IActionResult> GetAllOrders(CancellationToken cancellationToken)
 		{
-			try
-			{
-				var result = await _service.GetOrdersAsync(cancellationToken);
+			throw new OperationCanceledException();
 
-				if (result is null || result.Count() <= 0)
-				{
-					return NoContent();
-				}
+			var result = await _service.GetOrdersAsync(cancellationToken);
 
-				return Ok(result);
-			}
-			catch (OperationCanceledException)
+			if (result is null || result.Count() <= 0)
 			{
-				return BadRequest();
+				return NoContent();
 			}
+
+			return Ok(result);
 		}
 		[HttpGet("{id}")]
 		public async Task<IActionResult> GetOrder(int id, CancellationToken cancellationToken)
 		{
-			try
-			{
-				var result = await _service.GetOrderByIdAsync(id, cancellationToken);
+			var result = await _service.GetOrderByIdAsync(id, cancellationToken);
 
-				if (result is null) return NotFound();
+			if (result is null) return NotFound();
 
-				return Ok(result);
-			}
-			catch (OperationCanceledException)
-			{
-				return BadRequest();
-			}
+			return Ok(result);
 		}
 
 		[HttpPost("add")]
@@ -57,15 +45,8 @@ namespace SomeShop.Controllers
 		{
 			if (item is null) return BadRequest();
 
-			try
-			{
-				await _service.CreateOrderAsync(item, cancellationToken);
-				return Ok();
-			}
-			catch (OperationCanceledException)
-			{
-				return BadRequest();
-			}
+			await _service.CreateOrderAsync(item, cancellationToken);
+			return Ok();
 		}
 
 		[HttpPut("update/{id}")]
@@ -73,34 +54,20 @@ namespace SomeShop.Controllers
 		{
 			if (item is null || id != item.Id) return BadRequest();
 
-			try
+			var toUpdate = await _service.GetOrderByIdAsync(id, cancellationToken);
+			if (toUpdate != null)
 			{
-				var toUpdate = await _service.GetOrderByIdAsync(id, cancellationToken);
-				if (toUpdate != null)
-				{
-					await _service.UpdateOrderAsync(item, cancellationToken);
-					return Ok();
-				}
-				return NotFound();
+				await _service.UpdateOrderAsync(item, cancellationToken);
+				return Ok();
 			}
-			catch (OperationCanceledException)
-			{
-				return BadRequest();
-			}
+			return NotFound();
 		}
 
 		[HttpDelete("delete/{id}")]
 		public async Task<IActionResult> DeleteOrder(int id, CancellationToken cancellationToken)
 		{
-			try
-			{
-				await _service.DeleteOrderByIdAsync(id, cancellationToken);
-				return NoContent();
-			}
-			catch (OperationCanceledException)
-			{
-				return BadRequest();
-			}
+			await _service.DeleteOrderByIdAsync(id, cancellationToken);
+			return NoContent();
 		}
 	}
 }

@@ -1,3 +1,4 @@
+using SomeShop.Middleware;
 using SomeShop.Models;
 using SomeShop.Repositories;
 using SomeShop.Services;
@@ -7,7 +8,7 @@ namespace SomeShop
 {
     public class Program
 	{
-		public static async Task Main(string[] args)
+		public static void Main(string[] args)
 		{
 			var builder = WebApplication.CreateBuilder(args);
 
@@ -15,21 +16,12 @@ namespace SomeShop
 			builder.Services.AddScoped<IShopContext, ShopContext>();
 			builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 
-			builder.Services.AddScoped<IOrderItemService, OrderItemService>()
-				.AddScoped<ICategoryService, CategoryService>()
-				.AddScoped<IClientService, ClientService>()
-				.AddScoped<IEmployeeService, EmployeeService>()
-				.AddScoped<IManufacturerService, ManufacturerService>()
-				.AddScoped<IOrderService, OrderService>()
-				.AddScoped<IOrderItemService, OrderItemService>()
-				.AddScoped<IOrderStatusService, OrderStatusService>()
-				.AddScoped<IPaymentService, PaymentService>()
-				.AddScoped<IPaymentProviderService, PaymentProviderService>()
-				.AddScoped<IPaymentStatusService, PaymentStatusService>()
-				.AddScoped<IProductService, ProductService>()
-				.AddScoped<IShopService, ShopService>()
-				.AddScoped<IShoppingSessionService, ShoppingSessionService>()
-				.AddScoped<IShopStorageService, ShopStorageService>();
+			builder.Services.Scan(scan => 
+				scan.FromCallingAssembly()
+				.AddClasses()
+				.AsMatchingInterface()
+				.WithScopedLifetime()
+			);
 
 
 			builder.Services.AddControllers();
@@ -50,6 +42,7 @@ namespace SomeShop
 
 			app.UseAuthorization();
 
+			app.UseMiddleware<GlobalExceptionHandlerMiddleware>();
 
 			app.MapControllers();
 

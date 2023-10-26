@@ -7,59 +7,36 @@ using System.Linq.Expressions;
 
 namespace SomeShop.Services
 {
-    public class ManufacturerService : IManufacturerService
-    {
-        //private readonly ManufacturerContext _context;
-        private readonly IGenericRepository<Manufacturer> _repository;
-        public ManufacturerService(IGenericRepository<Manufacturer> repository)
-        {
-            _repository = repository;
-        }
+	public class ManufacturerService : IManufacturerService
+	{
+		//private readonly ManufacturerContext _context;
+		private readonly IGenericRepository<Manufacturer> _repository;
+		public ManufacturerService(IGenericRepository<Manufacturer> repository)
+		{
+			_repository = repository;
+		}
 
 		public async Task CreateManufacturerAsync(Manufacturer item, CancellationToken cancellatioonToken)
 		{
 			cancellatioonToken.ThrowIfCancellationRequested();
-			try
-			{
-				await _repository.CreateAsync(item, cancellatioonToken);
-			}
-			catch (OperationCanceledException)
-			{
-				throw;
-			}
+			await _repository.CreateAsync(item, cancellatioonToken);
 		}
 
 		public async Task DeleteManufacturerAsync(Manufacturer item, CancellationToken cancellatioonToken)
 		{
 			cancellatioonToken.ThrowIfCancellationRequested();
-			try
-			{
-				await _repository.RemoveAsync(item, cancellatioonToken);
-			}
-			catch (OperationCanceledException)
-			{
-				throw;
-			}
+			await _repository.RemoveAsync(item, cancellatioonToken);
 		}
 
 		public async Task DeleteManufacturerByIdAsync(int id, CancellationToken cancellationToken)
 		{
 			cancellationToken.ThrowIfCancellationRequested();
 
-			try
-			{
-				await _repository.DeleteAsync(
-					x => x.Id == id,
-					cancellationToken);
-			}
-			catch (OperationCanceledException)
-			{
-				throw;
-			}
+			await _repository.DeleteAsync(x => x.Id == id, cancellationToken);
 		}
 
 		public async Task<Manufacturer> GetManufacturerByIdAsync(int id, CancellationToken cancellatioonToken)
-        {
+		{
 			cancellatioonToken.ThrowIfCancellationRequested();
 			try
 			{
@@ -81,41 +58,20 @@ namespace SomeShop.Services
 		{
 			cancellatioonToken.ThrowIfCancellationRequested();
 
-			try
-			{
-				return await _repository.GetAsync(cancellatioonToken);
-			}
-			catch (OperationCanceledException)
-			{
-				throw;
-			}
+			return await _repository.GetAsync(cancellatioonToken);
 		}
 
 		public async Task<IEnumerable<Manufacturer>> GetManufacturersAsync(Expression<Func<Manufacturer, bool>> predicate, CancellationToken cancellatioonToken)
 		{
 			cancellatioonToken.ThrowIfCancellationRequested();
 
-			try
-			{
-				return await _repository.GetAsync(predicate, cancellatioonToken);
-			}
-			catch (OperationCanceledException)
-			{
-				throw;
-			}
+			return await _repository.GetAsync(predicate, cancellatioonToken);
 		}
 
 		public async Task UpdateManufacturerAsync(Manufacturer item, CancellationToken cancellatioonToken)
 		{
 			cancellatioonToken.ThrowIfCancellationRequested();
-			try
-			{
-				await _repository.UpdateAsync(item, cancellatioonToken);
-			}
-			catch (OperationCanceledException)
-			{
-				throw;
-			}
+			await _repository.UpdateAsync(item, cancellatioonToken);
 		}
 	}
 }

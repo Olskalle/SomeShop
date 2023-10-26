@@ -19,37 +19,22 @@ namespace SomeShop.Controllers
 		[HttpGet("all")]
 		public async Task<IActionResult> GetAllOrderStatuss(CancellationToken cancellationToken)
 		{
-			try
+			var result = await _service.GetOrderStatusesAsync(cancellationToken);
+			if (result is null || result.Count() <= 0)
 			{
-				var result = await _service.GetOrderStatusesAsync(cancellationToken);
-
-				if (result is null || result.Count() <= 0)
-				{
-					return NoContent();
-				}
-
-				return Ok(result);
+				return NoContent();
 			}
-			catch (OperationCanceledException)
-			{
-				return BadRequest();
-			}
+
+			return Ok(result);
 		}
 		[HttpGet("{id}")]
 		public async Task<IActionResult> GetOrderStatus(int id, CancellationToken cancellationToken)
 		{
-			try
-			{
-				var result = await _service.GetStatusByIdAsync(id, cancellationToken);
+			var result = await _service.GetStatusByIdAsync(id, cancellationToken);
 
-				if (result is null) return NotFound();
+			if (result is null) return NotFound();
 
-				return Ok(result);
-			}
-			catch (OperationCanceledException)
-			{
-				return BadRequest();
-			}
+			return Ok(result);
 		}
 
 		[HttpPost("add")]
@@ -73,34 +58,20 @@ namespace SomeShop.Controllers
 		{
 			if (item is null || id != item.Id) return BadRequest();
 
-			try
+			var toUpdate = await _service.GetStatusByIdAsync(id, cancellationToken);
+			if (toUpdate != null)
 			{
-				var toUpdate = await _service.GetStatusByIdAsync(id, cancellationToken);
-				if (toUpdate != null)
-				{
-					await _service.UpdateOrderStatusAsync(item, cancellationToken);
-					return Ok();
-				}
-				return NotFound();
+				await _service.UpdateOrderStatusAsync(item, cancellationToken);
+				return Ok();
 			}
-			catch (OperationCanceledException)
-			{
-				return BadRequest();
-			}
+			return NotFound();
 		}
 
 		[HttpDelete("delete/{id}")]
 		public async Task<IActionResult> DeleteOrderStatus(int id, CancellationToken cancellationToken)
 		{
-			try
-			{
-				await _service.DeleteOrderStatusByIdAsync(id, cancellationToken);
-				return NoContent();
-			}
-			catch (OperationCanceledException)
-			{
-				return BadRequest();
-			}
+			await _service.DeleteOrderStatusByIdAsync(id, cancellationToken);
+			return NoContent();
 		}
 	}
 }

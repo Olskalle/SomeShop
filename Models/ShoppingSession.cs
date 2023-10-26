@@ -6,8 +6,8 @@ namespace SomeShop.Models
 	public class ShoppingSession
 	{
 		public int Id { get; set; }
-		public List<CartItem> CartItems { get; set; } = null!;
-		public List<Product> Products { get; set; } = null!;
+		public List<CartItem> CartItems { get; set; } = new();
+		public List<Product> Products { get; set; } = new();
 		public int ClientId { get; set; }
 		public Client Client { get; set; } = null!;
 	}

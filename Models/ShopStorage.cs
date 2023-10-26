@@ -7,9 +7,9 @@ namespace SomeShop.Models
 	public class ShopStorage
 	{
 		public int ShopId { get; set; }
-		public Shop Shop { get; set; } = null!;
+		public Shop? Shop { get; set; }
 		public int ProductId { get; set; }
-		public Product Product { get; set; } = null!;
+		public Product? Product { get; set; }
 		public int Quantity { get; set; } = 0;
 	}
 }
