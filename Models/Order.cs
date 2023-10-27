@@ -11,7 +11,7 @@ namespace SomeShop.Models
 		public List<OrderItem> OrderItems { get; set; } = null!;
 		public List<Product> Products { get; set; } = null!;
 		public DateTime CreationDate { get; set; } = DateTime.UtcNow;
-		public DateTime ReceiveDate { get; set; }
+		public DateTime? ReceiveDate { get; set; } = null;
 		public int ShopId { get; set; }
 		public Shop Shop { get; set; } = null!;
 		public int EmployeeId { get; set; }

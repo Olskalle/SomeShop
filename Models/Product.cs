@@ -10,6 +10,7 @@ namespace SomeShop.Models
 		public string Name { get; set; } = null!;
 		public string? Description { get; set; }
 		public virtual List<Category> Categories { get; set; } = new();
+		public virtual List<ProductCategory> ProductCategories { get; set; } = new();
 		public int ManufacturerId { get; set; }
 		public virtual Manufacturer? Manufacturer { get; set; }
 		public decimal Rating { get; set; } = 0;

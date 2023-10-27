@@ -55,7 +55,9 @@ namespace SomeShop.Services
 		{
 			cancellationToken.ThrowIfCancellationRequested();
 
-			return await _repository.GetAsync(cancellationToken);
+			return await _repository.GetWithIncludeAsync(cancellationToken, 
+				client => client.Sessions, 
+				client => client.Orders);
 		}
 
 		public async Task<IEnumerable<Client>> GetClientsAsync(Expression<Func<Client, bool>> predicate,

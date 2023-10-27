@@ -197,6 +197,13 @@ namespace SomeShop
 			});
 			modelBuilder.Entity<ShopStorage>()
 				.ToTable(t => t.HasCheckConstraint("Quantity", "Quantity >= 0"));
+
+			modelBuilder.Entity<ProductCategory>(pc =>
+			{
+				pc.HasKey(x => new { x.ProductId, x.CategoryId });
+				pc.Property(x => x.ProductId).IsRequired();
+				pc.Property(x => x.CategoryId).IsRequired();
+			});
 		}
 
 		private void ConfigureRelations(ModelBuilder modelBuilder)
@@ -210,7 +217,14 @@ namespace SomeShop
 
 				p.HasMany(x => x.Categories)
 					.WithMany(x => x.Products)
-					.UsingEntity(j => j.ToTable("ProductCategory"));
+					.UsingEntity<ProductCategory>(
+						j => j.HasOne(pc => pc.Category)
+							.WithMany(c => c.ProductCategories)
+							.HasForeignKey(pc => pc.CategoryId),
+						j => j.HasOne(pc => pc.Product)
+							.WithMany(p => p.ProductCategories)
+							.HasForeignKey(pc => pc.ProductId)
+					);
 
 				p.HasMany(p => p.Orders)
 					.WithMany(o => o.Products)
@@ -301,18 +315,155 @@ namespace SomeShop
 		private void SeedDatabase(ModelBuilder modelBuilder)
 		{
 			modelBuilder.Entity<Category>()
-				.HasData(new Category[] {
-					new Category() { Id = 1, Name = "For Men" , Products = new() },
-					new Category() { Id = 2, Name = "For Women" , Products = new() },
-					new Category() { Id = 3, Name = "Sports" , Products = new() },
-					new Category() { Id = 4, Name = "Hiking", Products = new() }
-				});
+				.HasData(
+					new Category() { Id = 1, Name = "For Men" },
+					new Category() { Id = 2, Name = "For Women" },
+					new Category() { Id = 3, Name = "Sports" },
+					new Category() { Id = 4, Name = "Hiking" },
+					new Category() { Id = 5, Name = "Yoga" }
+				);
 
 			modelBuilder.Entity<Manufacturer>()
 				.HasData(
-					new Manufacturer() { Id = 1, Name = "Adidas"},
-					new Manufacturer() { Id = 2, Name = "China-Super"},
+					new Manufacturer() { Id = 1, Name = "Adidas" },
+					new Manufacturer() { Id = 2, Name = "China-Super" },
 					new Manufacturer() { Id = 3, Name = "Nike"}
+				);
+
+			modelBuilder.Entity<Client>()
+				.HasData(
+					new Client() { Id = 1, Name = "Ivan" },
+					new Client() { Id = 2, Name = "Anatoliy" },
+					new Client() { Id = 3, Name = "Bartek" }
+				);
+
+			modelBuilder.Entity<Employee>()
+				.HasData(
+					new Employee() { Id = 1, Name = "Gus", PhoneNumber = "89001001090", ShopId = 1},
+					new Employee() { Id = 2, Name = "Walter", PhoneNumber = "89053332222", ShopId = 3},
+					new Employee() { Id = 3, Name = "Valentina", PhoneNumber = "89999009090", ShopId = 2},
+					new Employee() { Id = 4, Name = "Gennadiy", PhoneNumber = "81234567890", ShopId = 3}
+				);
+
+			modelBuilder.Entity<Shop>()
+				.HasData(
+					new Shop() { Id = 1, Address = "Perm, Sibirskaya st.", PhoneNumber = "89998889955"},
+					new Shop() { Id = 2, Address = "Moscow, GUM", PhoneNumber = "89665577889"},
+					new Shop() { Id = 3, Address = "USA, Kansas, Hays, Oak st.", PhoneNumber = "89997775566"}
+				);
+
+			modelBuilder.Entity<Product>()
+				.HasData(
+					new Product()
+					{
+						Id = 1,
+						Name = "Red boots",
+						ManufacturerId = 1,
+						Rating = 100
+					},
+					new Product()
+					{
+						Id = 2,
+						Name = "Super sticky stick",
+						ManufacturerId = 2,
+						Rating = 33
+					}
+				);
+
+			modelBuilder.Entity < ProductCategory>()
+				.HasData(
+					new {ProductId = 1, CategoryId = 1},
+					new {ProductId = 1, CategoryId = 3},
+					new {ProductId = 2, CategoryId = 2},
+					new {ProductId = 2, CategoryId = 5}
+				);
+
+			modelBuilder.Entity<OrderStatus>()
+				.HasData(
+					new OrderStatus() { Id = 1, Name = "Created"},
+					new OrderStatus() { Id = 2, Name = "In process"},
+					new OrderStatus() { Id = 3, Name = "Delivering"},
+					new OrderStatus() { Id = 4, Name = "Ready"},
+					new OrderStatus() { Id = 5, Name = "Canceled"}
+				);
+
+			modelBuilder.Entity<PaymentStatus>()
+				.HasData(
+					new PaymentStatus() { Id = 1, Name = "Confirmed"},
+					new PaymentStatus() { Id = 2, Name = "Rejected"}
+				);
+
+			modelBuilder.Entity<PaymentProvider>()
+				.HasData(
+					new PaymentProvider() { Id = 1, Name = "Sber"},
+					new PaymentProvider() { Id = 2, Name = "Tinkoff"},
+					new PaymentProvider() { Id = 3, Name = "UralFD"},
+					new PaymentProvider() { Id = 4, Name = "QIWI"},
+					new PaymentProvider() { Id = 5, Name = "PayPal"}
+				);
+
+			modelBuilder.Entity<ShoppingSession>()
+				.HasData(
+					new ShoppingSession() 
+					{ 
+						Id = 1, 
+						ClientId = 3
+					},
+					new ShoppingSession()
+					{
+						Id = 2,
+						ClientId = 2
+					}
+				);
+
+			modelBuilder.Entity<CartItem>()
+				.HasData(
+					new CartItem() { ProductId = 1, SessionId = 2, Quantity = 1},
+					new CartItem() { ProductId = 2, SessionId = 2, Quantity = 1},
+					new CartItem() { ProductId = 1, SessionId = 1, Quantity = 10}
+				);
+
+			modelBuilder.Entity<Order>()
+				.HasData(
+					new Order()
+					{
+						Id = 1,
+						ClientId = 1,
+						ShopId = 1,
+						EmployeeId = 1,
+						StatusId = 1
+					},
+					new Order()
+					{
+						Id = 2,
+						ClientId = 3,
+						ShopId = 3,
+						EmployeeId = 4,
+						StatusId = 4
+					}
+				);
+
+			modelBuilder.Entity<OrderItem>()
+				.HasData(
+					new OrderItem() { OrderId = 1, ProductId = 1, Quantity = 2},
+					new OrderItem() { OrderId = 1, ProductId = 2, Quantity = 4},
+					new OrderItem() { OrderId = 2, ProductId = 1, Quantity = 10},
+					new OrderItem() { OrderId = 2, ProductId = 2, Quantity = 1}
+				);
+
+			modelBuilder.Entity<Payment>()
+				.HasData(
+					new Payment() { OrderId = 2, ProviderId = 1, StatusId = 1 }
+				);
+
+			modelBuilder.Entity<ShopStorage>()
+				.HasData(
+					new ShopStorage() { ShopId = 1, ProductId = 1, Quantity = 100},
+					new ShopStorage() { ShopId = 2, ProductId = 1, Quantity = 234},
+					new ShopStorage() { ShopId = 3, ProductId = 1, Quantity = 2},
+					new ShopStorage() { ShopId = 1, ProductId = 2, Quantity = 2222},
+					new ShopStorage() { ShopId = 2, ProductId = 2, Quantity = 1010},
+					new ShopStorage() { ShopId = 3, ProductId = 2, Quantity = 7889}
 				);
 		}
 	}

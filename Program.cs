@@ -1,8 +1,10 @@
+using Microsoft.AspNetCore.HttpLogging;
 using SomeShop.Middleware;
 using SomeShop.Models;
 using SomeShop.Repositories;
 using SomeShop.Services;
 using SomeShop.Services.Interfaces;
+using System.Text.Json.Serialization;
 
 namespace SomeShop
 {
@@ -24,10 +26,25 @@ namespace SomeShop
 			);
 
 
-			builder.Services.AddControllers();
+			builder.Services.AddControllers()
+				.AddJsonOptions(options =>
+				{
+					options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+				});
 			// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 			builder.Services.AddEndpointsApiExplorer();
 			builder.Services.AddSwaggerGen();
+
+			builder.Services.AddHttpLogging( options =>
+			{
+				options.LoggingFields = HttpLoggingFields.All;
+			});
+
+			builder.Host.ConfigureLogging(logging =>
+			{
+				logging.ClearProviders();
+				logging.AddConsole();
+			});
 
 			var app = builder.Build();
 
