@@ -9,7 +9,7 @@ namespace SomeShop.Repositories
 		Task<IQueryable<TEntity>> GetAsync(Expression<Func<TEntity, bool>> func, CancellationToken cancellationToken);
 		Task UpdateAsync(TEntity entity, CancellationToken cancellationToken);
 		Task RemoveAsync(TEntity entity, CancellationToken cancellationToken);
-		Task DeleteAsync(Func<TEntity, bool> predicate, CancellationToken cancellationToken);
+		Task DeleteAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken cancellationToken);
 		Task<IQueryable<TEntity>> GetWithIncludeAsync(CancellationToken cancellationToken, 
 			params Expression<Func<TEntity, object>>[] includeExpressions);
 		Task<IQueryable<TEntity>> GetWithIncludeAsync(CancellationToken cancellationToken, 

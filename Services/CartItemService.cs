@@ -6,14 +6,21 @@ using System.Linq.Expressions;
 
 namespace SomeShop.Services
 {
+	[LogAction]
 	public class CartItemService : ICartItemService
 	{
 		private readonly IGenericRepository<CartItem> _repository;
-
-		public CartItemService(IGenericRepository<CartItem> repository) => _repository = repository;
+		private readonly ILogger<CartItemService>? _logger;
+		
+		public CartItemService(IGenericRepository<CartItem> repository, ILogger<CartItemService>? logger)
+		{
+			_repository = repository;
+			_logger = logger;
+		}
 
 		public async Task CreateCartItemAsync(CartItem item, CancellationToken cancellationToken)
 		{
+			_logger?.LogInformation("CREATE: {0}", item);
 			cancellationToken.ThrowIfCancellationRequested();
 
 				await _repository.CreateAsync(item, cancellationToken);
@@ -21,13 +28,15 @@ namespace SomeShop.Services
 
 		public async Task DeleteCartItemAsync(CartItem item, CancellationToken cancellationToken)
 		{
+			_logger?.LogInformation("DELETE: {0}", item);
 			cancellationToken.ThrowIfCancellationRequested();
 
-			await _repository.CreateAsync(item, cancellationToken);
+			await _repository.RemoveAsync(item, cancellationToken);
 		}
 
 		public async Task DeleteCartItemByKeyAsync(int sessionId, int productId, CancellationToken cancellationToken)
-		{
+		{	
+			_logger?.LogInformation("DELETE BY KEY: {{{0}, {1}}}", sessionId, productId);
 			cancellationToken.ThrowIfCancellationRequested();
 
 				await _repository.DeleteAsync(
@@ -37,6 +46,7 @@ namespace SomeShop.Services
 
 		public async Task<IEnumerable<CartItem>> GetCartItemsAsync(CancellationToken cancellationToken)
 		{
+			_logger?.LogInformation("GET");
 			cancellationToken.ThrowIfCancellationRequested();
 
 				return await _repository.GetAsync(cancellationToken);
@@ -45,6 +55,7 @@ namespace SomeShop.Services
 		public async Task<IEnumerable<CartItem>> GetCartItemsAsync(Expression<Func<CartItem, bool>> predicate, 
 			CancellationToken cancellationToken)
 		{
+			_logger?.LogInformation("GET WITH CONDITION");
 			cancellationToken.ThrowIfCancellationRequested();
 
 				return await _repository.GetAsync(predicate, cancellationToken);
@@ -52,6 +63,7 @@ namespace SomeShop.Services
 
 		public async Task<CartItem?> GetItemByKeyAsync(int sessionId, int productId, CancellationToken cancellationToken)
 		{
+			_logger?.LogInformation("GET BY KEY: {{ {0}, {1} }}", sessionId, productId);
 			cancellationToken.ThrowIfCancellationRequested();
 
 				var result = await _repository
@@ -67,6 +79,7 @@ namespace SomeShop.Services
 
 		public async Task<IEnumerable<CartItem>> GetItemsByProductIdAsync(int id, CancellationToken cancellationToken)
 		{
+			_logger?.LogInformation("GET BY PRODUCT: {0}", id);
 			cancellationToken.ThrowIfCancellationRequested();
 
 				return await _repository.GetAsync(x => x.ProductId == id, cancellationToken);
@@ -74,6 +87,7 @@ namespace SomeShop.Services
 
 		public async Task<IEnumerable<CartItem>> GetItemsBySessionIdAsync(int id, CancellationToken cancellationToken)
 		{
+			_logger?.LogInformation("GET BY SESSION {0}", id);
 			cancellationToken.ThrowIfCancellationRequested();
 
 				return await _repository.GetAsync(x => x.SessionId == id, cancellationToken);
@@ -81,6 +95,7 @@ namespace SomeShop.Services
 
 		public async Task UpdateCartItemAsync(CartItem item, CancellationToken cancellationToken)
 		{
+			_logger?.LogInformation("UPDATE {0}", item);
 			cancellationToken.ThrowIfCancellationRequested();
 
 				await _repository.UpdateAsync(item, cancellationToken);

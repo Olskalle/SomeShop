@@ -11,5 +11,10 @@ namespace SomeShop.Models
 		public string? PhoneNumber { get; set; }
 		public List<Order> Orders { get; set; } = new();
 		public List<ShoppingSession> Sessions { get; set; } = new();
+
+		public override string ToString()
+		{
+			return $"{{ Id: {Id}, Name: {Name ?? "null"} }}";
+		}
 	}
 }

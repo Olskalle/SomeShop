@@ -12,5 +12,10 @@ namespace SomeShop.Models
 		public List<Order> Orders { get; set; } = new();
 		public int ShopId { get; set; }
 		public Shop Shop { get; set; } = null!;
+
+		public override string ToString()
+		{
+			return $"{{ {Id}, {Name ?? "null"} }}";
+		}
 	}
 }

@@ -75,7 +75,7 @@ namespace SomeShop.Repositories
 			await _context.SaveChangesAsync();
 		}
 
-		public async Task DeleteAsync(Func<TEntity, bool> predicate, CancellationToken cancellationToken)
+		public async Task DeleteAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken cancellationToken)
 		{
 			_logger.Log(LogLevel.Information, $"EntitySet<{typeof(TEntity)}>: DELETE ({predicate})");
 
@@ -85,7 +85,6 @@ namespace SomeShop.Repositories
 			//		 Only providers that implement 'IAsyncQueryProvider' can be used
 			//		 for Entity Framework asynchronous operations.
 			await entitySet.Where(predicate)
-				.AsQueryable()
 				.ExecuteDeleteAsync(cancellationToken);
 			await _context.SaveChangesAsync();
 		}

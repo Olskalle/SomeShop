@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics.CodeAnalysis;
+using System.Xml.Linq;
 
 namespace SomeShop.Models
 {
@@ -12,5 +13,10 @@ namespace SomeShop.Models
 		public PaymentProvider Provider { get; set; } = null!;
 		public int StatusId { get; set; }
 		public PaymentStatus Status { get; set; } = null!;
+
+		public override string ToString()
+		{
+			return $"{{ OrderId: {OrderId}, Status: {StatusId} }}";
+		}
 	}
 }

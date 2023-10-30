@@ -10,5 +10,10 @@ namespace SomeShop.Models
 		public List<Product> Products { get; set; } = new();
 		public int ClientId { get; set; }
 		public Client Client { get; set; } = null!;
+
+		public override string ToString()
+		{
+			return $"{{ Id: {Id}, ClientId: {ClientId} }}";
+		}
 	}
 }

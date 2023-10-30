@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics.CodeAnalysis;
+using System.Xml.Linq;
 
 namespace SomeShop.Models
 {
@@ -13,5 +14,10 @@ namespace SomeShop.Models
 		public List<ShopStorage> ShopStorages { get; set; } = new();
 		public List<Order> Orders { get; set; } = new();
 		public List<Employee> Employees { get; set; } = new();
+
+		public override string ToString()
+		{
+			return $"{{ Id: {Id}, Name: {Address ?? "null"} }}";
+		}
 	}
 }

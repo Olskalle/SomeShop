@@ -11,13 +11,16 @@ namespace SomeShop.Services
 	{
         //private readonly ShopContext _context;
         private readonly IGenericRepository<Shop> _repository;
-        public ShopService(IGenericRepository<Shop> repository)
+		private readonly ILogger<ShopService>? _logger;
+        public ShopService(IGenericRepository<Shop> repository, ILogger<ShopService>? logger)
         {
 			_repository = repository;
+			_logger = logger;
         }
 
 		public async Task CreateShopAsync(Shop item, CancellationToken cancellationToken)
 		{
+			_logger?.LogInformation("CREATE: {0}", item);
 			cancellationToken.ThrowIfCancellationRequested();
 
 				await _repository.CreateAsync(item, cancellationToken);
@@ -25,6 +28,7 @@ namespace SomeShop.Services
 
 		public async Task DeleteShopAsync(Shop item, CancellationToken cancellationToken)
 		{
+			_logger?.LogInformation("DELETE: {0}", item);
 			cancellationToken.ThrowIfCancellationRequested();
 
 			await _repository.RemoveAsync(item, cancellationToken);
@@ -32,6 +36,7 @@ namespace SomeShop.Services
 
 		public async Task DeleteShopByIdAsync(int id, CancellationToken cancellationToken)
 		{
+			_logger?.LogInformation("DELETE BY ID: {0}", id);
 			cancellationToken.ThrowIfCancellationRequested();
 
 			await _repository.DeleteAsync(x => x.Id == id, cancellationToken);
@@ -39,6 +44,7 @@ namespace SomeShop.Services
 
 		public async Task<Shop?> GetShopByIdAsync(int id, CancellationToken cancellationToken)
 		{
+			_logger?.LogInformation("GET BY ID: {0}", id);
 			cancellationToken.ThrowIfCancellationRequested();
 
 			var result = await _repository.GetAsync(x => x.Id == id, cancellationToken);
@@ -52,6 +58,7 @@ namespace SomeShop.Services
 
 		public async Task<IEnumerable<Shop>> GetShopsAsync(CancellationToken cancellationToken)
 		{
+			_logger?.LogInformation("GET");
 			cancellationToken.ThrowIfCancellationRequested();
 
 			return await _repository.GetAsync(cancellationToken);
@@ -59,6 +66,7 @@ namespace SomeShop.Services
 
 		public async Task<IEnumerable<Shop>> GetShopsAsync(Expression<Func<Shop, bool>> predicate, CancellationToken cancellationToken)
 		{
+			_logger?.LogInformation("GET WUITH CONDITION");
 			cancellationToken.ThrowIfCancellationRequested();
 
 			return await _repository.GetAsync(predicate, cancellationToken);
@@ -66,6 +74,7 @@ namespace SomeShop.Services
 
 		public async Task UpdateShopAsync(Shop item, CancellationToken cancellationToken)
 		{
+			_logger?.LogInformation("UPDATE: {0}", item);
 			cancellationToken.ThrowIfCancellationRequested();
 
 			await _repository.UpdateAsync(item, cancellationToken);

@@ -20,5 +20,10 @@ namespace SomeShop.Models
 		public virtual List<ShoppingSession> ShoppingSessions { get; set; } = new();
 		public virtual List<Shop> Shops { get; set; } = new();
 		public virtual List<ShopStorage> ShopStorages { get; set; } = new();
+
+		public override string ToString()
+		{
+			return $"{{ Id: {Id}, Name: {Name ?? "null"} }}";
+		}
 	}
 }

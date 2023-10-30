@@ -9,14 +9,17 @@ namespace SomeShop.Services
 	public class PaymentStatusService : IPaymentStatusService
 	{
 		private readonly IGenericRepository<PaymentStatus> _repository;
+		private readonly ILogger<PaymentStatusService>? _logger;
 
-		public PaymentStatusService(IGenericRepository<PaymentStatus> repository)
+		public PaymentStatusService(IGenericRepository<PaymentStatus> repository, ILogger<PaymentStatusService>? logger)
 		{
 			_repository = repository;
+			_logger = logger;
 		}
 
 		public async Task CreatePaymentStatusAsync(PaymentStatus item, CancellationToken cancellationToken)
 		{
+			_logger?.LogInformation("CREATE: {0}", item);
 			cancellationToken.ThrowIfCancellationRequested();
 
 			await _repository.CreateAsync(item, cancellationToken);
@@ -24,6 +27,7 @@ namespace SomeShop.Services
 
 		public async Task DeletePaymentStatusAsync(PaymentStatus item, CancellationToken cancellationToken)
 		{
+			_logger?.LogInformation("DELETE: {0}", item);
 			cancellationToken.ThrowIfCancellationRequested();
 
 			await _repository.RemoveAsync(item, cancellationToken);
@@ -31,6 +35,7 @@ namespace SomeShop.Services
 
 		public async Task DeletePaymentStatusByIdAsync(int id, CancellationToken cancellationToken)
 		{
+			_logger?.LogInformation("DELETE BY ID: {0}", id);
 			cancellationToken.ThrowIfCancellationRequested();
 
 			await _repository.DeleteAsync(
@@ -40,6 +45,7 @@ namespace SomeShop.Services
 
 		public async Task<PaymentStatus?> GetPaymentStatusByIdAsync(int id, CancellationToken cancellationToken)
 		{
+			_logger?.LogInformation("GET BY ID: {0}", id);
 			cancellationToken.ThrowIfCancellationRequested();
 
 			var result = await _repository.GetAsync(x => x.Id == id, cancellationToken);
@@ -53,6 +59,7 @@ namespace SomeShop.Services
 
 		public async Task<IEnumerable<PaymentStatus>> GetPaymentStatusesAsync(CancellationToken cancellationToken)
 		{
+			_logger?.LogInformation("GET");
 			cancellationToken.ThrowIfCancellationRequested();
 
 			return await _repository.GetAsync(cancellationToken);
@@ -60,6 +67,7 @@ namespace SomeShop.Services
 
 		public async Task<IEnumerable<PaymentStatus>> GetPaymentStatusesAsync(Expression<Func<PaymentStatus, bool>> predicate, CancellationToken cancellationToken)
 		{
+			_logger?.LogInformation("GET WITH CONDITION");
 			cancellationToken.ThrowIfCancellationRequested();
 
 			return await _repository.GetAsync(predicate, cancellationToken);
@@ -67,6 +75,7 @@ namespace SomeShop.Services
 
 		public async Task UpdatePaymentStatusAsync(PaymentStatus item, CancellationToken cancellationToken)
 		{
+			_logger?.LogInformation("UPDATE: {0}", item);
 			cancellationToken.ThrowIfCancellationRequested();
 
 			await _repository.UpdateAsync(item, cancellationToken);

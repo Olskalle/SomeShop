@@ -10,5 +10,10 @@ namespace SomeShop.Models
 		public int ProductId { get; set; }
 		public Product? Product { get; set; }
 		public int Quantity { get; set; } = 1;
+
+		public override string ToString()
+		{
+			return $"{{ {SessionId}, {ProductId} }}";
+		}
 	}
 }

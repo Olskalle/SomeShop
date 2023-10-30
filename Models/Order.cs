@@ -19,5 +19,10 @@ namespace SomeShop.Models
 		public virtual Payment? Payment { get; set; }
 		public int StatusId { get; set; }
 		public OrderStatus Status { get; set; } = null!;
+
+		public override string ToString()
+		{
+			return $"{{ ClientId: {ClientId}, ShopId: {ShopId}, CreationDate: {CreationDate} }}";
+		}
 	}
 }
