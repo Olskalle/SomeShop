@@ -1,184 +1,122 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
-using SomeShop.Extensions;
+using System;
 
 
 namespace SomeShop.Repositories
 {
 	public class GenericRepository<TEntity> : IGenericRepository<TEntity> where TEntity : class
 	{
-		private IShopContext context;
+		private readonly IShopContext _context;
+		ILogger<IGenericRepository<TEntity>> _logger;
 		private DbSet<TEntity> entitySet;
 
-        public GenericRepository(IShopContext context)
-        {
-			this.context = context;
+		public GenericRepository(IShopContext context, ILogger<IGenericRepository<TEntity>> logger)
+		{
+			this._context = context;
+			this._logger = logger;
 			entitySet = context.Set<TEntity>();
-        }
-
-        public void Create(TEntity entity)
-		{
-			entitySet.Add(entity);
-			context.SaveChanges();
-		}
-
-		public IQueryable<TEntity> Get()
-		{
-			return entitySet
-				.AsNoTracking()
-				.AsQueryable();
-		}
-
-		public IQueryable<TEntity> Get(Expression<Func<TEntity, bool>> func)
-		{
-			return entitySet
-				.AsNoTracking()
-				.Where(func)
-				.AsQueryable();
-		}
-
-		public void Remove(TEntity entity)
-		{
-			entitySet.Remove(entity); 
-			context.SaveChanges();
-		}
-
-		public void Update(TEntity entity)
-		{
-			entitySet.Update(entity); 
-			context.SaveChanges();
-		}
-		public IQueryable<TEntity> GetWithInclude(params Expression<Func<TEntity, object>>[] includeExpressions)
-		{
-			return Include(includeExpressions).AsQueryable();
-		}
-
-		public IQueryable<TEntity> GetWithInclude(Expression<Func<TEntity, bool>> predicate,
-			params Expression<Func<TEntity, object>>[] includeProperties)
-		{
-			var query = Include(includeProperties);
-			return query.Where(predicate)
-				.AsQueryable();
-		}
-
-		private IQueryable<TEntity> Include(params Expression<Func<TEntity, object>>[] includeExpressions)
-		{
-			IQueryable<TEntity> query = entitySet.AsNoTracking();
-			return includeExpressions
-				.Aggregate(query, 
-					(current, includeProperty) => current.Include(includeProperty));
 		}
 
 		public async Task CreateAsync(TEntity entity, CancellationToken cancellationToken)
 		{
-			await RunWithCancellationHandling(cancellationToken, 
-				async () =>
-				{
-					await entitySet.AddAsync(entity);
-					context.SaveChanges();
-				});
+			_logger.LogInformation("CREATE {0} OF TYPE {1}", entity, typeof(TEntity));
+
+			cancellationToken.ThrowIfCancellationRequested();
+
+			await entitySet.AddAsync(entity);
+			await _context.SaveChangesAsync();
 		}
 
-		public async Task<IEnumerable<TEntity>> GetAsync(CancellationToken cancellationToken)
+		public async Task<IQueryable<TEntity>> GetAsync(CancellationToken cancellationToken)
 		{
-			return await RunWithCancellationHandling(cancellationToken,
-				async () =>
-				{
-					return await entitySet
-						.AsNoTracking()
-						.ToListAsync();
-				});
+			_logger.LogInformation("GET ITEMS OF TYPE {0}", typeof(TEntity));
+
+			cancellationToken.ThrowIfCancellationRequested();
+
+			return await Task.Run( () => 
+				entitySet
+					.AsNoTracking()
+					.AsQueryable()
+			);
 		}
 
-		public async Task<IEnumerable<TEntity>> GetAsync(Expression<Func<TEntity, bool>> func, CancellationToken cancellationToken)
+		public async Task<IQueryable<TEntity>> GetAsync(Expression<Func<TEntity, bool>> func, CancellationToken cancellationToken)
 		{
-			return await RunWithCancellationHandling(cancellationToken,
-				async () =>
-				{
-					return await this.Get(func)
-						.ToListAsync();
-				});
+			_logger.LogInformation("GET ITEMS OF TYPE {0} WHERE {1}", typeof(TEntity), func.Body);
+
+			cancellationToken.ThrowIfCancellationRequested();
+
+			return await Task.Run(() =>
+				entitySet
+					.AsNoTracking()
+					.Where(func)
+					.AsQueryable()
+			);
 		}
 
 		public async Task UpdateAsync(TEntity entity, CancellationToken cancellationToken)
 		{
-			await RunWithCancellationHandling(cancellationToken,
-				Task.Run(() =>
-				{
-					entitySet.Update(entity);
-					context.SaveChanges();
-				}));
+			_logger.LogInformation("UPDATE {0} OF TYPE {1}", entity, typeof(TEntity));
+			cancellationToken.ThrowIfCancellationRequested();
+
+			entitySet.Update(entity);
+			await _context.SaveChangesAsync();
 		}
 
 		public async Task RemoveAsync(TEntity entity, CancellationToken cancellationToken)
 		{
-			await RunWithCancellationHandling(cancellationToken,
-				Task.Run(() =>
-				{
-					entitySet.Remove(entity);
-					context.SaveChanges();
-				}));
+			_logger.LogInformation("REMOVE {0} OF TYPE {1}", entity, typeof(TEntity));
+			cancellationToken.ThrowIfCancellationRequested();
+
+			entitySet.Remove(entity);
+			await _context.SaveChangesAsync();
 		}
 
-		public async Task DeleteAsync(Func<TEntity, bool> predicate, CancellationToken cancellationToken)
+		public async Task DeleteAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken cancellationToken)
 		{
-			await RunWithCancellationHandling(cancellationToken,
-				async() =>
-				{
-					await entitySet.Where(predicate)
-						.AsQueryable()
-						.ExecuteDeleteAsync(cancellationToken);
-					context.SaveChanges();
-				});
+			_logger.LogInformation("DELETE ITEMS OF TYPE {0} WHERE {1}", typeof(TEntity), predicate.Body);
+
+			cancellationToken.ThrowIfCancellationRequested();
+
+			// FIX:  The provider for the source 'IQueryable' doesn't implement 'IAsyncQueryProvider'.
+			//		 Only providers that implement 'IAsyncQueryProvider' can be used
+			//		 for Entity Framework asynchronous operations.
+			//		 # InMemory storage does not imply ExecuteUpdate and ExecuteDelete
+
+			await entitySet.Where(predicate)
+				.ExecuteDeleteAsync(cancellationToken);
+			await _context.SaveChangesAsync();
 		}
 
-		private async Task<T> RunWithCancellationHandling<T>(CancellationToken cancellationToken, Func<Task<T>> body)
+		public async Task<IQueryable<TEntity>> GetWithIncludeAsync(CancellationToken cancellationToken, 
+			params Expression<Func<TEntity, object>>[] includeExpressions)
 		{
-			if (cancellationToken.IsCancellationRequested)
-			{
-				throw new OperationCanceledException();
-			}
+			_logger.LogInformation("GET ITEMS OF TYPE {0} INCLUDE {1}", typeof(TEntity), includeExpressions);
 
-			try
-			{
-				 return await body();
-			}
-			catch (OperationCanceledException)
-			{
-				throw;
-			}
+			cancellationToken.ThrowIfCancellationRequested();
+
+			return await IncludeAsync(includeExpressions);
 		}
-		private async Task RunWithCancellationHandling(CancellationToken cancellationToken, Func<Task> body)
-		{
-			if (cancellationToken.IsCancellationRequested)
-			{
-				throw new OperationCanceledException();
-			}
 
-			try
-			{
-				await body();
-			}
-			catch (OperationCanceledException)
-			{
-				throw;
-			}
+		public async Task<IQueryable<TEntity>> GetWithIncludeAsync(CancellationToken cancellationToken, Expression<Func<TEntity, bool>> predicate,
+			params Expression<Func<TEntity, object>>[] includeProperties)
+		{
+			_logger.LogInformation("GET ITEMS OF TYPE {0} WHERE {1} INCLUDE {2}", typeof(TEntity), predicate.Body, includeProperties);
+
+			cancellationToken.ThrowIfCancellationRequested();
+
+			var query = await IncludeAsync(includeProperties);
+			return query.Where(predicate)
+				.AsQueryable();
 		}
-		private async Task RunWithCancellationHandling(CancellationToken cancellationToken, Task task)
-		{
-			if (cancellationToken.IsCancellationRequested)
-			{
-				throw new OperationCanceledException();
-			}
 
-			try
-			{
-				await task;
-			}
-			catch (OperationCanceledException)
-			{
-				throw;
-			}
+		private async Task<IQueryable<TEntity>> IncludeAsync(params Expression<Func<TEntity, object>>[] includeExpressions)
+		{
+			IQueryable<TEntity> query = entitySet.AsNoTracking();
+			return await Task.Run(() => includeExpressions
+				.Aggregate(query,
+					(current, includeProperty) => current.Include(includeProperty)));
 		}
 	}
 }

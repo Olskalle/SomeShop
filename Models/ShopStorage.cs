@@ -6,10 +6,15 @@ namespace SomeShop.Models
 {
 	public class ShopStorage
 	{
-		[Required] public int ShopId { get; set; }
-		[Required] public Shop Shop { get; set; } = null!;
-		[Required] public int ProductId { get; set; }
-		[Required] public Product Product { get; set; } = null!;
+		public int ShopId { get; set; }
+		public Shop? Shop { get; set; }
+		public int ProductId { get; set; }
+		public Product? Product { get; set; }
 		public int Quantity { get; set; } = 0;
+
+		public override string ToString()
+		{
+			return $"{{ ShopId: {ShopId}, ProductId: {ProductId} }}";
+		}
 	}
 }

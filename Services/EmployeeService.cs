@@ -10,110 +10,76 @@ namespace SomeShop.Services
 	public class EmployeeService : IEmployeeService
 	{
 		private readonly IGenericRepository<Employee> _repository;
+		private readonly ILogger<EmployeeService> _logger;
 
-        public EmployeeService(IGenericRepository<Employee> repository)
-        {
+		public EmployeeService(IGenericRepository<Employee> repository, ILogger<EmployeeService> logger)
+		{
 			_repository = repository;
-        }
+			_logger = logger;
+		}
 
 		public async Task CreateEmployeeAsync(Employee item, CancellationToken cancellationToken)
 		{
+			_logger?.LogInformation("CREATE: {0}", item);
 			cancellationToken.ThrowIfCancellationRequested();
-			try
-			{
-				await _repository.CreateAsync(item, cancellationToken);
-			}
-			catch (OperationCanceledException)
-			{
-				throw;
-			}
+
+			await _repository.CreateAsync(item, cancellationToken);
 		}
 
 		public async Task DeleteEmployeeAsync(Employee item, CancellationToken cancellationToken)
 		{
+			_logger?.LogInformation("DELETE: {0}", item);
 			cancellationToken.ThrowIfCancellationRequested();
-			try
-			{
-				await _repository.RemoveAsync(item, cancellationToken);
-			}
-			catch (OperationCanceledException)
-			{
-				throw;
-			}
+
+			await _repository.RemoveAsync(item, cancellationToken);
 		}
 
 		public async Task DeleteEmployeeByIdAsync(int id, CancellationToken cancellationToken)
 		{
+			_logger?.LogInformation("DELETE BY ID: {0}", id);
 			cancellationToken.ThrowIfCancellationRequested();
 
-			try
-			{
-				await _repository.DeleteAsync(
-					x => x.Id == id,
-					cancellationToken);
-			}
-			catch (OperationCanceledException)
-			{
-				throw;
-			}
+			await _repository.DeleteAsync(
+				x => x.Id == id,
+				cancellationToken);
 		}
 
-		public async Task<Employee> GetEmployeeByIdAsync(int id, CancellationToken cancellationToken)
+		public async Task<Employee?> GetEmployeeByIdAsync(int id, CancellationToken cancellationToken)
 		{
+			_logger?.LogInformation("GET BY ID: {0}", id);
 			cancellationToken.ThrowIfCancellationRequested();
-			try
-			{
-				var result = await _repository.GetAsync(x => x.Id == id, cancellationToken);
 
-				if (result is null) throw new NullReferenceException();
+			var result = await _repository.GetAsync(x => x.Id == id, cancellationToken);
 
-				if (result.Count() > 1) throw new KeyNotUniqueException();
+			if (result is null) throw new NullReferenceException();
 
-				return result.FirstOrDefault();
-			}
-			catch (OperationCanceledException)
-			{
-				throw;
-			}
+			if (result.Count() > 1) throw new KeyNotUniqueException();
+
+			return result.FirstOrDefault();
 		}
 
 		public async Task<IEnumerable<Employee>> GetEmployeesAsync(CancellationToken cancellationToken)
 		{
+			_logger?.LogInformation("GET");
 			cancellationToken.ThrowIfCancellationRequested();
-			try
-			{
-				return await _repository.GetAsync(cancellationToken);
-			}
-			catch (OperationCanceledException)
-			{
-				throw;
-			}
+
+			return await _repository.GetAsync(cancellationToken);
 		}
 
 		public async Task<IEnumerable<Employee>> GetEmployeesAsync(Expression<Func<Employee, bool>> predicate, CancellationToken cancellationToken)
 		{
+			_logger?.LogInformation("GET WITH CONDITION");
 			cancellationToken.ThrowIfCancellationRequested();
-			try
-			{
-				return await _repository.GetAsync(predicate, cancellationToken);
-			}
-			catch (OperationCanceledException)
-			{
-				throw;
-			}
+
+			return await _repository.GetAsync(predicate, cancellationToken);
 		}
 
 		public async Task UpdateEmployeeAsync(Employee item, CancellationToken cancellationToken)
 		{
+			_logger?.LogInformation("UPDATE: {0}", item);
 			cancellationToken.ThrowIfCancellationRequested();
-			try
-			{
-				await _repository.UpdateAsync(item, cancellationToken);
-			}
-			catch (OperationCanceledException)
-			{
-				throw;
-			}
+
+			await _repository.UpdateAsync(item, cancellationToken);
 		}
 	}
 }

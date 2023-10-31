@@ -9,87 +9,62 @@ namespace SomeShop.Services
 	public class CartItemService : ICartItemService
 	{
 		private readonly IGenericRepository<CartItem> _repository;
-
-		public CartItemService(IGenericRepository<CartItem> repository) => _repository = repository;
+		private readonly ILogger<CartItemService>? _logger;
+		
+		public CartItemService(IGenericRepository<CartItem> repository, ILogger<CartItemService>? logger)
+		{
+			_repository = repository;
+			_logger = logger;
+		}
 
 		public async Task CreateCartItemAsync(CartItem item, CancellationToken cancellationToken)
 		{
+			_logger?.LogInformation("CREATE: {0}", item);
 			cancellationToken.ThrowIfCancellationRequested();
 
-			try
-			{
 				await _repository.CreateAsync(item, cancellationToken);
-			}
-			catch (OperationCanceledException)
-			{
-				throw;
-			}
 		}
 
 		public async Task DeleteCartItemAsync(CartItem item, CancellationToken cancellationToken)
 		{
+			_logger?.LogInformation("DELETE: {0}", item);
 			cancellationToken.ThrowIfCancellationRequested();
 
-			try
-			{
-				await _repository.CreateAsync(item, cancellationToken);
-			}
-			catch (OperationCanceledException)
-			{
-				throw;
-			}
+			await _repository.RemoveAsync(item, cancellationToken);
 		}
 
 		public async Task DeleteCartItemByKeyAsync(int sessionId, int productId, CancellationToken cancellationToken)
-		{
+		{	
+			_logger?.LogInformation("DELETE BY KEY: {{{0}, {1}}}", sessionId, productId);
 			cancellationToken.ThrowIfCancellationRequested();
 
-			try
-			{
 				await _repository.DeleteAsync(
 					x => x.SessionId == sessionId && x.ProductId == productId, 
 					cancellationToken);
-			}
-			catch (OperationCanceledException)
-			{
-				throw;
-			}
 		}
 
 		public async Task<IEnumerable<CartItem>> GetCartItemsAsync(CancellationToken cancellationToken)
 		{
+			_logger?.LogInformation("GET");
 			cancellationToken.ThrowIfCancellationRequested();
 
-			try
-			{
 				return await _repository.GetAsync(cancellationToken);
-			}
-			catch (OperationCanceledException)
-			{
-				throw;
-			}
 		}
 
 		public async Task<IEnumerable<CartItem>> GetCartItemsAsync(Expression<Func<CartItem, bool>> predicate, 
 			CancellationToken cancellationToken)
 		{
+			_logger?.LogInformation("GET WITH CONDITION");
 			cancellationToken.ThrowIfCancellationRequested();
 
-			try
-			{
 				return await _repository.GetAsync(predicate, cancellationToken);
-			}
-			catch (OperationCanceledException)
-			{
-				throw;
-			}
 		}
 
 		public async Task<CartItem?> GetItemByKeyAsync(int sessionId, int productId, CancellationToken cancellationToken)
 		{
+			_logger?.LogInformation("GET BY KEY: {{ {0}, {1} }}", sessionId, productId);
 			cancellationToken.ThrowIfCancellationRequested();
-			try
-			{
+
 				var result = await _repository
 					.GetAsync(x => x.SessionId == sessionId && x.ProductId == productId, 
 						cancellationToken);
@@ -99,54 +74,30 @@ namespace SomeShop.Services
 				if (result.Count() > 1) throw new KeyNotUniqueException();
 
 				return result.FirstOrDefault();
-			}
-			catch (Exception)
-			{
-
-				throw;
-			}
 		}
 
 		public async Task<IEnumerable<CartItem>> GetItemsByProductIdAsync(int id, CancellationToken cancellationToken)
 		{
+			_logger?.LogInformation("GET BY PRODUCT: {0}", id);
 			cancellationToken.ThrowIfCancellationRequested();
 
-			try
-			{
 				return await _repository.GetAsync(x => x.ProductId == id, cancellationToken);
-			}
-			catch (OperationCanceledException)
-			{
-				throw;
-			}
 		}
 
 		public async Task<IEnumerable<CartItem>> GetItemsBySessionIdAsync(int id, CancellationToken cancellationToken)
 		{
+			_logger?.LogInformation("GET BY SESSION {0}", id);
 			cancellationToken.ThrowIfCancellationRequested();
 
-			try
-			{
 				return await _repository.GetAsync(x => x.SessionId == id, cancellationToken);
-			}
-			catch (OperationCanceledException)
-			{
-				throw;
-			}
 		}
 
 		public async Task UpdateCartItemAsync(CartItem item, CancellationToken cancellationToken)
 		{
+			_logger?.LogInformation("UPDATE {0}", item);
 			cancellationToken.ThrowIfCancellationRequested();
 
-			try
-			{
 				await _repository.UpdateAsync(item, cancellationToken);
-			}
-			catch (OperationCanceledException)
-			{
-				throw;
-			}
 		}
 	}
 }

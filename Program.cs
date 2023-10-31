@@ -1,13 +1,16 @@
+using Microsoft.AspNetCore.HttpLogging;
+using SomeShop.Middleware;
 using SomeShop.Models;
 using SomeShop.Repositories;
 using SomeShop.Services;
 using SomeShop.Services.Interfaces;
+using System.Text.Json.Serialization;
 
 namespace SomeShop
 {
     public class Program
 	{
-		public static async Task Main(string[] args)
+		public static void Main(string[] args)
 		{
 			var builder = WebApplication.CreateBuilder(args);
 
@@ -15,27 +18,33 @@ namespace SomeShop
 			builder.Services.AddScoped<IShopContext, ShopContext>();
 			builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 
-			builder.Services.AddScoped<IOrderItemService, OrderItemService>()
-				.AddScoped<ICategoryService, CategoryService>()
-				.AddScoped<IClientService, ClientService>()
-				.AddScoped<IEmployeeService, EmployeeService>()
-				.AddScoped<IManufacturerService, ManufacturerService>()
-				.AddScoped<IOrderService, OrderService>()
-				.AddScoped<IOrderItemService, OrderItemService>()
-				.AddScoped<IOrderStatusService, OrderStatusService>()
-				.AddScoped<IPaymentService, PaymentService>()
-				.AddScoped<IPaymentProviderService, PaymentProviderService>()
-				.AddScoped<IPaymentStatusService, PaymentStatusService>()
-				.AddScoped<IProductService, ProductService>()
-				.AddScoped<IShopService, ShopService>()
-				.AddScoped<IShoppingSessionService, ShoppingSessionService>()
-				.AddScoped<IShopStorageService, ShopStorageService>();
+			builder.Services.Scan(scan => 
+				scan.FromCallingAssembly()
+				.AddClasses()
+				.AsMatchingInterface()
+				.WithScopedLifetime()
+			);
 
 
-			builder.Services.AddControllers();
+			builder.Services.AddControllers()
+				.AddJsonOptions(options =>
+				{
+					options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+				});
 			// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 			builder.Services.AddEndpointsApiExplorer();
 			builder.Services.AddSwaggerGen();
+
+			builder.Services.AddHttpLogging( options =>
+			{
+				options.LoggingFields = HttpLoggingFields.All;
+			});
+
+			builder.Host.ConfigureLogging(logging =>
+			{
+				logging.ClearProviders();
+				logging.AddConsole();
+			});
 
 			var app = builder.Build();
 
@@ -50,6 +59,8 @@ namespace SomeShop
 
 			app.UseAuthorization();
 
+			app.UseMiddleware<GlobalExceptionHandlerMiddleware>();
+			app.UseMiddleware<LoggingMiddleware>();
 
 			app.MapControllers();
 

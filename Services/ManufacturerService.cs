@@ -7,115 +7,76 @@ using System.Linq.Expressions;
 
 namespace SomeShop.Services
 {
-    public class ManufacturerService : IManufacturerService
-    {
-        //private readonly ManufacturerContext _context;
-        private readonly IGenericRepository<Manufacturer> _repository;
-        public ManufacturerService(IGenericRepository<Manufacturer> repository)
-        {
-            _repository = repository;
-        }
+	public class ManufacturerService : IManufacturerService
+	{
+		private readonly IGenericRepository<Manufacturer> _repository;
+		private readonly ILogger<ManufacturerService> _logger;
+
+		public ManufacturerService(IGenericRepository<Manufacturer> repository, ILogger<ManufacturerService> logger)
+		{
+			_repository = repository;
+			_logger = logger;
+		}
 
 		public async Task CreateManufacturerAsync(Manufacturer item, CancellationToken cancellatioonToken)
 		{
+			_logger?.LogInformation("CREATE: {0}", item);
 			cancellatioonToken.ThrowIfCancellationRequested();
-			try
-			{
-				await _repository.CreateAsync(item, cancellatioonToken);
-			}
-			catch (OperationCanceledException)
-			{
-				throw;
-			}
+
+			await _repository.CreateAsync(item, cancellatioonToken);
 		}
 
 		public async Task DeleteManufacturerAsync(Manufacturer item, CancellationToken cancellatioonToken)
 		{
+			_logger?.LogInformation("DELETE: {0}", item);
 			cancellatioonToken.ThrowIfCancellationRequested();
-			try
-			{
-				await _repository.RemoveAsync(item, cancellatioonToken);
-			}
-			catch (OperationCanceledException)
-			{
-				throw;
-			}
+
+			await _repository.RemoveAsync(item, cancellatioonToken);
 		}
 
 		public async Task DeleteManufacturerByIdAsync(int id, CancellationToken cancellationToken)
 		{
+			_logger?.LogInformation("DELETE BY ID: {0}", id);
 			cancellationToken.ThrowIfCancellationRequested();
 
-			try
-			{
-				await _repository.DeleteAsync(
-					x => x.Id == id,
-					cancellationToken);
-			}
-			catch (OperationCanceledException)
-			{
-				throw;
-			}
+			await _repository.DeleteAsync(x => x.Id == id, cancellationToken);
 		}
 
-		public async Task<Manufacturer> GetManufacturerByIdAsync(int id, CancellationToken cancellatioonToken)
-        {
+		public async Task<Manufacturer?> GetManufacturerByIdAsync(int id, CancellationToken cancellatioonToken)
+		{
+			_logger?.LogInformation("GET BY ID: {0}", id);
 			cancellatioonToken.ThrowIfCancellationRequested();
-			try
-			{
-				var result = await _repository.GetAsync(x => x.Id == id, cancellatioonToken);
 
-				if (result is null) throw new NullReferenceException();
+			var result = await _repository.GetAsync(x => x.Id == id, cancellatioonToken);
 
-				if (result.Count() > 1) throw new KeyNotUniqueException();
+			if (result is null) throw new NullReferenceException();
 
-				return result.FirstOrDefault();
-			}
-			catch (OperationCanceledException)
-			{
-				throw;
-			}
+			if (result.Count() > 1) throw new KeyNotUniqueException();
+
+			return result.FirstOrDefault();
 		}
 
 		public async Task<IEnumerable<Manufacturer>> GetManufacturersAsync(CancellationToken cancellatioonToken)
 		{
+			_logger?.LogInformation("GET");
 			cancellatioonToken.ThrowIfCancellationRequested();
 
-			try
-			{
-				return await _repository.GetAsync(cancellatioonToken);
-			}
-			catch (OperationCanceledException)
-			{
-				throw;
-			}
+			return await _repository.GetAsync(cancellatioonToken);
 		}
 
 		public async Task<IEnumerable<Manufacturer>> GetManufacturersAsync(Expression<Func<Manufacturer, bool>> predicate, CancellationToken cancellatioonToken)
 		{
+			_logger?.LogInformation("GET WITH CONDITION");
 			cancellatioonToken.ThrowIfCancellationRequested();
 
-			try
-			{
-				return await _repository.GetAsync(predicate, cancellatioonToken);
-			}
-			catch (OperationCanceledException)
-			{
-				throw;
-			}
+			return await _repository.GetAsync(predicate, cancellatioonToken);
 		}
 
 		public async Task UpdateManufacturerAsync(Manufacturer item, CancellationToken cancellatioonToken)
 		{
+			_logger?.LogInformation("UPDATE: {0}", item);
 			cancellatioonToken.ThrowIfCancellationRequested();
-			try
-			{
-				await _repository.UpdateAsync(item, cancellatioonToken);
-			}
-			catch (OperationCanceledException)
-			{
-				throw;
-			}
+			await _repository.UpdateAsync(item, cancellatioonToken);
 		}
 	}
 }

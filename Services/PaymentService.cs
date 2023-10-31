@@ -9,116 +9,76 @@ namespace SomeShop.Services
 	public class PaymentService : IPaymentService
 	{
 		private readonly IGenericRepository<Payment> _repository;
+		private readonly ILogger<PaymentService>? _logger;
 
-		public PaymentService(IGenericRepository<Payment> repository)
+		public PaymentService(IGenericRepository<Payment> repository, ILogger<PaymentService>? logger)
 		{
 			_repository = repository;
+			_logger = logger;
 		}
 
 		public async Task CreatePaymentAsync(Payment item, CancellationToken cancellationToken)
 		{
+			_logger?.LogInformation("CRAETE: {0}", item);
 			cancellationToken.ThrowIfCancellationRequested();
 
-			try
-			{
-				await _repository.CreateAsync(item, cancellationToken);
-			}
-			catch (OperationCanceledException)
-			{
-				throw;
-			}
+			await _repository.CreateAsync(item, cancellationToken);
 		}
 
 		public async Task DeletePaymentAsync(Payment item, CancellationToken cancellationToken)
 		{
+			_logger?.LogInformation("DELETE: {0}", item);
 			cancellationToken.ThrowIfCancellationRequested();
 
-			try
-			{
-				await _repository.RemoveAsync(item, cancellationToken);
-			}
-			catch (OperationCanceledException)
-			{
-				throw;
-			}
+			await _repository.RemoveAsync(item, cancellationToken);
 		}
 
 		public async Task DeletePaymentByOrderIdAsync(int id, CancellationToken cancellationToken)
 		{
+			_logger?.LogInformation("DELETE BY ID: {0}", id);
 			cancellationToken.ThrowIfCancellationRequested();
 
-			try
-			{
-				await _repository.DeleteAsync(
-					x => x.OrderId == id,
-					cancellationToken);
-			}
-			catch (OperationCanceledException)
-			{
-				throw;
-			}
+			await _repository.DeleteAsync(
+				x => x.OrderId == id,
+				cancellationToken);
 		}
 
 		public async Task<Payment?> GetPaymentByOrderIdAsync(int id, CancellationToken cancellationToken)
 		{
+			_logger?.LogInformation("GET BY ID", id);
 			cancellationToken.ThrowIfCancellationRequested();
 
-			try
-			{
-				var result = await _repository.GetAsync(x => x.OrderId == id, cancellationToken);
+			var result = await _repository.GetAsync(x => x.OrderId == id, cancellationToken);
 
-				if (result is null) throw new NullReferenceException();
+			if (result is null) throw new NullReferenceException();
 
-				if (result.Count() > 1) throw new KeyNotUniqueException();
+			if (result.Count() > 1) throw new KeyNotUniqueException();
 
-				return result.FirstOrDefault();
-			}
-			catch (OperationCanceledException)
-			{
-				throw;
-			}
+			return result.FirstOrDefault();
 		}
 
 		public async Task<IEnumerable<Payment>> GetPaymentsAsync(CancellationToken cancellationToken)
 		{
+			_logger?.LogInformation("GET");
 			cancellationToken.ThrowIfCancellationRequested();
 
-			try
-			{
-				return await _repository.GetAsync(cancellationToken);
-			}
-			catch (OperationCanceledException)
-			{
-				throw;
-			}
+			return await _repository.GetAsync(cancellationToken);
 		}
 
 		public async Task<IEnumerable<Payment>> GetPaymentsAsync(Expression<Func<Payment, bool>> predicate, CancellationToken cancellationToken)
 		{
+			_logger?.LogInformation("GET WITH CONDITION");
 			cancellationToken.ThrowIfCancellationRequested();
 
-			try
-			{
-				return await _repository.GetAsync(predicate, cancellationToken);
-			}
-			catch (OperationCanceledException)
-			{
-				throw;
-			}
+			return await _repository.GetAsync(predicate, cancellationToken);
 		}
 
 		public async Task UpdatePaymentAsync(Payment item, CancellationToken cancellationToken)
 		{
+			_logger?.LogInformation("UPDATE: {0}", item);
 			cancellationToken.ThrowIfCancellationRequested();
 
-			try
-			{
-				await _repository.UpdateAsync(item, cancellationToken);
-			}
-			catch (OperationCanceledException)
-			{
-				throw;
-			}
+			await _repository.UpdateAsync(item, cancellationToken);
 		}
 	}
 }

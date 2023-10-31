@@ -6,9 +6,13 @@ namespace SomeShop.Models
 {
 	public class Manufacturer
 	{
-		[Key,
-		DatabaseGenerated(DatabaseGeneratedOption.Identity)]
 		public int Id { get; set; }
-		[Required] public string Name { get; set; } = null!;
+		public string Name { get; set; } = null!;
+		public virtual List<Product> Products { get; set; } = new();
+
+		public override string ToString()
+		{
+			return $"{{ {Id}, {Name ?? "null"} }}";
+		}
 	}
 }

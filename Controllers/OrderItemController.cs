@@ -19,71 +19,45 @@ namespace SomeShop.Controllers
 		[HttpGet("all")]
 		public async Task<IActionResult> GetAllOrderItems(CancellationToken cancellationToken)
 		{
-			try
-			{
-				var result = await _service.GetOrderItemsAsync(cancellationToken);
 
-				if (result is null || !result.Any())
-				{
-					return NoContent();
-				}
+			var result = await _service.GetOrderItemsAsync(cancellationToken);
 
-				return Ok(result);
-			}
-			catch (OperationCanceledException)
+			if (result is null || !result.Any())
 			{
-				return BadRequest();
+				return NoContent();
 			}
+
+			return Ok(result);
 		}
+
 		[HttpGet("order/{id}")]
 		public async Task<IActionResult> GetItemsByOrder(int id, CancellationToken cancellationToken)
 		{
-			try
-			{
-				var result = await _service.GetItemsByOrderIdAsync(id, cancellationToken);
+			var result = await _service.GetItemsByOrderIdAsync(id, cancellationToken);
 
-				if (result is null || !result.Any()) return NoContent();
+			if (result is null || !result.Any()) return NoContent();
 
-				return Ok(result);
-			}
-			catch (OperationCanceledException)
-			{
-				return BadRequest();
-			}
+			return Ok(result);
 		}
 
 		[HttpGet("product/{id}")]
 		public async Task<IActionResult> GetItemsByProduct(int id, CancellationToken cancellationToken)
 		{
-			try
-			{
-				var result = await _service.GetItemsByProductIdAsync(id, cancellationToken);
+			var result = await _service.GetItemsByProductIdAsync(id, cancellationToken);
 
-				if (result is null || !result.Any()) return NoContent();
+			if (result is null || !result.Any()) return NoContent();
 
-				return Ok(result);
-			}
-			catch (OperationCanceledException)
-			{
-				return BadRequest();
-			}
+			return Ok(result);
 		}
 
 		[HttpGet("{orderId}&{productId}")]
 		public async Task<IActionResult> GetItemByKey(int orderId, int productId, CancellationToken cancellationToken)
 		{
-			try
-			{
-				var result = await _service.GetItemByKeyAsync(orderId, productId, cancellationToken);
+			var result = await _service.GetItemByKeyAsync(orderId, productId, cancellationToken);
 
-				if (result is null) return NotFound();
+			if (result is null) return NotFound();
 
-				return Ok(result);
-			}
-			catch (OperationCanceledException)
-			{
-				return BadRequest();
-			}
+			return Ok(result);
 		}
 
 		[HttpPost("add")]
@@ -91,15 +65,8 @@ namespace SomeShop.Controllers
 		{
 			if (item is null) return BadRequest();
 
-			try
-			{
-				await _service.CreateOrderItemAsync(item, cancellationToken);
-				return Ok();
-			}
-			catch (OperationCanceledException)
-			{
-				return BadRequest();
-			}
+			await _service.CreateOrderItemAsync(item, cancellationToken);
+			return Ok();
 		}
 
 		[HttpPut("update/{orderId}&{productId}")]
@@ -110,37 +77,22 @@ namespace SomeShop.Controllers
 				return BadRequest();
 			}
 
-			try
+			var toUpdate = await _service.GetItemByKeyAsync(orderId, productId, cancellationToken);
+			if (toUpdate != null)
 			{
-				var toUpdate = await _service.GetItemByKeyAsync(orderId, productId, cancellationToken);
-
-				if (toUpdate != null)
-				{
-					await _service.UpdateOrderItemAsync(item, cancellationToken);
-					return Ok();
-				}
-
-				return NotFound();
+				await _service.UpdateOrderItemAsync(item, cancellationToken);
+				return Ok();
 			}
-			catch (OperationCanceledException)
-			{
-				return BadRequest();
-			}
+
+			return NotFound();
 		}
 
 		[HttpDelete("delete/{orderId}&{productId}")]
 		public async Task<IActionResult> DeleteOrderItem(int orderId, int productId, CancellationToken cancellationToken)
 		{
-			try
-			{
-				await _service.DeleteOrderItemByKeyAsync(orderId, productId, cancellationToken);
+			await _service.DeleteOrderItemByKeyAsync(orderId, productId, cancellationToken);
 
-				return NoContent();
-			}
-			catch (OperationCanceledException)
-			{
-				return BadRequest();
-			}
+			return NoContent();
 		}
 	}
 }

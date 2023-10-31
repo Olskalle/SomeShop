@@ -9,121 +9,76 @@ namespace SomeShop.Services
 	public class OrderStatusService : IOrderStatusService
 	{
 		private readonly IGenericRepository<OrderStatus> _repository;
+		private readonly ILogger<OrderStatusService>? _logger;
 
-        public OrderStatusService(IGenericRepository<OrderStatus> repository)
-        {
+		public OrderStatusService(IGenericRepository<OrderStatus> repository, ILogger<OrderStatusService>? logger)
+		{
 			_repository = repository;
-        }
+			_logger = logger;
+		}
 
 		public async Task CreateOrderStatusAsync(OrderStatus item, CancellationToken cancellationToken)
 		{
+			_logger?.LogInformation("CREATE: {0}", item);
 			cancellationToken.ThrowIfCancellationRequested();
 
-			try
-			{
-				await _repository.CreateAsync(item, cancellationToken);
-			}
-			catch (OperationCanceledException)
-			{
-				throw;
-			}
+			await _repository.CreateAsync(item, cancellationToken);
 		}
 
 		public async Task DeleteOrderStatusAsync(OrderStatus item, CancellationToken cancellationToken)
 		{
+			_logger?.LogInformation("DELETE: {0}", item);
 			cancellationToken.ThrowIfCancellationRequested();
 
-			try
-			{
-				await _repository.RemoveAsync(item, cancellationToken);
-			}
-			catch (OperationCanceledException)
-			{
-				throw;
-			}
+			await _repository.RemoveAsync(item, cancellationToken);
 		}
 
 		public async Task DeleteOrderStatusByIdAsync(int id, CancellationToken cancellationToken)
 		{
+			_logger?.LogInformation("DELETE BY ID: {0}", id);
 			cancellationToken.ThrowIfCancellationRequested();
 
-			try
-			{
-				await _repository.DeleteAsync(
-					x => x.Id == id,
-					cancellationToken);
-			}
-			catch (OperationCanceledException)
-			{
-				throw;
-			}
+			await _repository.DeleteAsync(
+				x => x.Id == id,
+				cancellationToken);
 		}
 
 		public async Task<OrderStatus?> GetStatusByIdAsync(int id, CancellationToken cancellationToken)
 		{
+			_logger?.LogInformation("GET BY ID: {0}", id);
 			cancellationToken.ThrowIfCancellationRequested();
 
-			try
-			{
-				var result = await _repository.GetAsync(x => x.Id == id, cancellationToken);
+			var result = await _repository.GetAsync(x => x.Id == id, cancellationToken);
 
-				if (result is null) throw new NullReferenceException();
+			if (result is null) throw new NullReferenceException();
 
-				if (result.Count() > 1) throw new KeyNotUniqueException();
+			if (result.Count() > 1) throw new KeyNotUniqueException();
 
-				return result.FirstOrDefault();
-			}
-			catch (OperationCanceledException)
-			{
-				throw;
-			}
+			return result.FirstOrDefault();
 		}
 
 		public async Task<IEnumerable<OrderStatus>> GetOrderStatusesAsync(CancellationToken cancellationToken)
 		{
+			_logger?.LogInformation("GET");
 			cancellationToken.ThrowIfCancellationRequested();
 
-			try
-			{
-				return await _repository.GetAsync(cancellationToken);
-			}
-			catch (OperationCanceledException)
-			{
-				throw;
-			}
+			return await _repository.GetAsync(cancellationToken);
 		}
 
 		public async Task<IEnumerable<OrderStatus>> GetOrderStatusesAsync(Expression<Func<OrderStatus, bool>> predicate, CancellationToken cancellationToken)
 		{
-			if (cancellationToken.IsCancellationRequested)
-			{
-				throw new OperationCanceledException();
-			}
-			try
-			{
-				return await _repository.GetAsync(predicate, cancellationToken);
-			}
-			catch (OperationCanceledException)
-			{
-				throw;
-			}
+			_logger?.LogInformation("GET WITH CONDITION");
+			cancellationToken.ThrowIfCancellationRequested();
+
+			return await _repository.GetAsync(predicate, cancellationToken);
 		}
 
 		public async Task UpdateOrderStatusAsync(OrderStatus item, CancellationToken cancellationToken)
 		{
-			if (cancellationToken.IsCancellationRequested)
-			{
-				throw new OperationCanceledException();
-			}
+			_logger?.LogInformation("UPDATE: {0}", item);
+			cancellationToken.ThrowIfCancellationRequested();
 
-			try
-			{
-				await _repository.UpdateAsync(item, cancellationToken);
-			}
-			catch (OperationCanceledException)
-			{
-				throw;
-			}
+			await _repository.UpdateAsync(item, cancellationToken);
 		}
 	}
 }

@@ -6,118 +6,83 @@ using System.Linq.Expressions;
 
 namespace SomeShop.Services
 {
-    public class ClientService : IClientService
-    {
-        private readonly IGenericRepository<Client> _repository;
+	public class ClientService : IClientService
+	{
+		private readonly IGenericRepository<Client> _repository;
+		private readonly ILogger<ClientService>? _logger;
 
-        public ClientService(IGenericRepository<Client> repository)
-        {
-            _repository = repository;
-        }
-
-		public async Task CreateClientAsync(Client client, CancellationToken cancellationToken)
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-
-			try
-			{
-				await _repository.CreateAsync(client, cancellationToken);
-			}
-			catch (OperationCanceledException)
-			{
-				throw;
-			}
-        }
-
-		public async Task DeleteClientAsync(Client client, CancellationToken cancellationToken)
+		public ClientService(IGenericRepository<Client> repository, ILogger<ClientService>? logger)
 		{
+			_repository = repository;
+			_logger = logger;
+		}
+
+		public async Task CreateClientAsync(Client item, CancellationToken cancellationToken)
+		{
+			_logger?.LogInformation("CREATE: {0}", item);
 			cancellationToken.ThrowIfCancellationRequested();
 
-			try
-			{
-				await _repository.RemoveAsync(client, cancellationToken);
-			}
-			catch (OperationCanceledException)
-			{
-				throw;
-			}
+			await _repository.CreateAsync(item, cancellationToken);
+		}
+
+		public async Task DeleteClientAsync(Client item, CancellationToken cancellationToken)
+		{
+			_logger?.LogInformation("DELETE: {0}", item);
+			cancellationToken.ThrowIfCancellationRequested();
+
+			await _repository.RemoveAsync(item, cancellationToken);
 		}
 
 		public async Task DeleteClientByIdAsync(int id, CancellationToken cancellationToken)
 		{
+			_logger?.LogInformation("DELETE BY ID: {0}", id);
 			cancellationToken.ThrowIfCancellationRequested();
 
-			try
-			{
-				await _repository.DeleteAsync(
-					x => x.Id == id,
-					cancellationToken);
-			}
-			catch (OperationCanceledException)
-			{
-				throw;
-			}
+			await _repository.DeleteAsync(
+				x => x.Id == id,
+				cancellationToken);
 		}
 
 		public async Task<Client?> GetClientByIdAsync(int id, CancellationToken cancellationToken)
-        {
+		{
+			_logger?.LogInformation("GET BY ID: {0}", id);
 			cancellationToken.ThrowIfCancellationRequested();
 
-			try
-			{
-				var result = await _repository.GetAsync(x => x.Id == id, cancellationToken);
+			var result = await _repository.GetAsync(x => x.Id == id, cancellationToken);
 
-				if (result is null) throw new NullReferenceException();
+			if (result is null) throw new NullReferenceException();
 
-				if (result.Count() > 1) throw new KeyNotUniqueException();
+			if (result.Count() > 1) throw new KeyNotUniqueException();
 
-				return result.FirstOrDefault();
-			}
-			catch (OperationCanceledException)
-			{
-				throw;
-			}
-        }
+			return result.FirstOrDefault();
+		}
 
 		public async Task<IEnumerable<Client>> GetClientsAsync(CancellationToken cancellationToken)
 		{
+			_logger?.LogInformation("GET");
 			cancellationToken.ThrowIfCancellationRequested();
 
-			try
-			{
-				return await _repository.GetAsync(cancellationToken);
-			}
-			catch (OperationCanceledException)
-			{
-				throw;
-			}
+			return await _repository.GetWithIncludeAsync(cancellationToken, 
+				client => client.Sessions, 
+				client => client.Orders);
 		}
 
-		public async Task<IEnumerable<Client>> GetClientsAsync(Expression<Func<Client, bool>> predicate, 
+		public async Task<IEnumerable<Client>> GetClientsAsync(Expression<Func<Client, bool>> predicate,
 			CancellationToken cancellationToken)
 		{
+			_logger?.LogInformation("GET WITH CONDITION");
 			cancellationToken.ThrowIfCancellationRequested();
 
-			try
-			{
-				return await _repository.GetAsync(predicate, cancellationToken);
-			}
-			catch (Exception)
-			{
-				throw;
-			}
+			return await _repository.GetAsync(predicate, cancellationToken);
 		}
 
-		public async Task UpdateClientAsync(Client client, CancellationToken cancellationToken)
+		public async Task UpdateClientAsync(Client item, CancellationToken cancellationToken)
 		{
-			try
-			{
-				await _repository.UpdateAsync(client, cancellationToken);
-			}
-			catch (OperationCanceledException)
-			{
-				throw;
-			}
+			_logger?.LogInformation("UPDATE: {0}", item);
+			cancellationToken.ThrowIfCancellationRequested();
+
+			await _repository.UpdateAsync(item, cancellationToken);
 		}
+
 	}
 }

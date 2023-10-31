@@ -6,9 +6,12 @@ namespace SomeShop.Models
 {
 	public class PaymentProvider
 	{
-		[Key,
-		DatabaseGenerated(DatabaseGeneratedOption.Identity)]
 		public int Id { get; set; }
-		[Required] public string Name { get; set; } = null!;
+		public string Name { get; set; } = null!;
+
+		public override string ToString()
+		{
+			return $"{{ Id: {Id}, Name: {Name ?? "null"} }}";
+		}
 	}
 }

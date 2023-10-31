@@ -22,5 +22,6 @@ namespace SomeShop
 		DbSet<ShopStorage> ShopStorages { get; set; }
 		DbSet<T> Set<T>() where T : class;
 		int SaveChanges();
+		Task<int> SaveChangesAsync();
 	}
 }

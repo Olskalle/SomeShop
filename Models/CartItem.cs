@@ -5,10 +5,15 @@ namespace SomeShop.Models
 {
 	public class CartItem
 	{
-		[Required] public int SessionId { get; set; }
-		[Required] public virtual ShoppingSession ShoppingSession { get; set; } = null!;
-		[Required]
+		public int SessionId { get; set; }
+		public ShoppingSession? ShoppingSession { get; set; }
 		public int ProductId { get; set; }
-		[Required] public virtual Product Product { get; set; } = null!;
+		public Product? Product { get; set; }
+		public int Quantity { get; set; } = 1;
+
+		public override string ToString()
+		{
+			return $"{{ {SessionId}, {ProductId} }}";
+		}
 	}
 }
