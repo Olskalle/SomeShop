@@ -60,6 +60,7 @@ namespace SomeShop
 			app.UseAuthorization();
 
 			app.UseMiddleware<GlobalExceptionHandlerMiddleware>();
+			app.UseMiddleware<LoggingMiddleware>();
 
 			app.MapControllers();
 

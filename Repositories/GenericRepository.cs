@@ -1,7 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
-using SomeShop.Extensions;
-using Microsoft.EntityFrameworkCore.Query;
 using System;
 
 
@@ -22,7 +20,7 @@ namespace SomeShop.Repositories
 
 		public async Task CreateAsync(TEntity entity, CancellationToken cancellationToken)
 		{
-			_logger.Log(LogLevel.Information, $"EntitySet<{typeof(TEntity)}>: CREATE", entity);
+			_logger.LogInformation("CREATE {0} OF TYPE {1}", entity, typeof(TEntity));
 
 			cancellationToken.ThrowIfCancellationRequested();
 
@@ -32,7 +30,7 @@ namespace SomeShop.Repositories
 
 		public async Task<IQueryable<TEntity>> GetAsync(CancellationToken cancellationToken)
 		{
-			_logger.Log(LogLevel.Information, $"EntitySet<{typeof(TEntity)}>: GET");
+			_logger.LogInformation("GET ITEMS OF TYPE {0}", typeof(TEntity));
 
 			cancellationToken.ThrowIfCancellationRequested();
 
@@ -45,7 +43,7 @@ namespace SomeShop.Repositories
 
 		public async Task<IQueryable<TEntity>> GetAsync(Expression<Func<TEntity, bool>> func, CancellationToken cancellationToken)
 		{
-			_logger.Log(LogLevel.Information, $"EntitySet<{typeof(TEntity)}>: GET ({func})");
+			_logger.LogInformation("GET ITEMS OF TYPE {0} WHERE {1}", typeof(TEntity), func.Body);
 
 			cancellationToken.ThrowIfCancellationRequested();
 
@@ -59,7 +57,7 @@ namespace SomeShop.Repositories
 
 		public async Task UpdateAsync(TEntity entity, CancellationToken cancellationToken)
 		{
-			_logger.Log(LogLevel.Information, $"EntitySet<{typeof(TEntity)}>: UPDATE ({entity})");
+			_logger.LogInformation("UPDATE {0} OF TYPE {1}", entity, typeof(TEntity));
 			cancellationToken.ThrowIfCancellationRequested();
 
 			entitySet.Update(entity);
@@ -68,7 +66,7 @@ namespace SomeShop.Repositories
 
 		public async Task RemoveAsync(TEntity entity, CancellationToken cancellationToken)
 		{
-			_logger.Log(LogLevel.Information, $"EntitySet<{typeof(TEntity)}>: REMOVE ({entity})");
+			_logger.LogInformation("REMOVE {0} OF TYPE {1}", entity, typeof(TEntity));
 			cancellationToken.ThrowIfCancellationRequested();
 
 			entitySet.Remove(entity);
@@ -77,21 +75,24 @@ namespace SomeShop.Repositories
 
 		public async Task DeleteAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken cancellationToken)
 		{
-			_logger.Log(LogLevel.Information, $"EntitySet<{typeof(TEntity)}>: DELETE ({predicate})");
+			_logger.LogInformation("DELETE ITEMS OF TYPE {0} WHERE {1}", typeof(TEntity), predicate.Body);
 
 			cancellationToken.ThrowIfCancellationRequested();
 
 			// FIX:  The provider for the source 'IQueryable' doesn't implement 'IAsyncQueryProvider'.
 			//		 Only providers that implement 'IAsyncQueryProvider' can be used
 			//		 for Entity Framework asynchronous operations.
+			//		 # InMemory storage does not imply ExecuteUpdate and ExecuteDelete
+
 			await entitySet.Where(predicate)
 				.ExecuteDeleteAsync(cancellationToken);
 			await _context.SaveChangesAsync();
 		}
 
-		public async Task<IQueryable<TEntity>> GetWithIncludeAsync(CancellationToken cancellationToken, params Expression<Func<TEntity, object>>[] includeExpressions)
+		public async Task<IQueryable<TEntity>> GetWithIncludeAsync(CancellationToken cancellationToken, 
+			params Expression<Func<TEntity, object>>[] includeExpressions)
 		{
-			_logger.Log(LogLevel.Information, $"EntitySet<{typeof(TEntity)}>: GET INCLUDE ({includeExpressions})");
+			_logger.LogInformation("GET ITEMS OF TYPE {0} INCLUDE {1}", typeof(TEntity), includeExpressions);
 
 			cancellationToken.ThrowIfCancellationRequested();
 
@@ -101,7 +102,7 @@ namespace SomeShop.Repositories
 		public async Task<IQueryable<TEntity>> GetWithIncludeAsync(CancellationToken cancellationToken, Expression<Func<TEntity, bool>> predicate,
 			params Expression<Func<TEntity, object>>[] includeProperties)
 		{
-			_logger.Log(LogLevel.Information, $"EntitySet<{typeof(TEntity)}>: GET INCLUDE ({predicate}, {includeProperties})");
+			_logger.LogInformation("GET ITEMS OF TYPE {0} WHERE {1} INCLUDE {2}", typeof(TEntity), predicate.Body, includeProperties);
 
 			cancellationToken.ThrowIfCancellationRequested();
 

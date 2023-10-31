@@ -6,7 +6,6 @@ using System.Linq.Expressions;
 
 namespace SomeShop.Services
 {
-	[LogAction]
 	public class CartItemService : ICartItemService
 	{
 		private readonly IGenericRepository<CartItem> _repository;
