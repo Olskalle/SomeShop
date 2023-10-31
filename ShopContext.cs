@@ -10,10 +10,7 @@ namespace SomeShop
 	{
 		private readonly IConfiguration? _configuration;
 
-        public ShopContext()
-        {
-            
-        }
+        public ShopContext() { } // For migrations
         public ShopContext(IConfiguration configuration)
 		{
 			_configuration = configuration;
