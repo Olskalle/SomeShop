@@ -8,8 +8,13 @@ namespace SomeShop
 {
 	public class ShopContext : DbContext, IShopContext
 	{
-		private readonly IConfiguration _configuration;
-		public ShopContext(IConfiguration configuration)
+		private readonly IConfiguration? _configuration;
+
+        public ShopContext()
+        {
+            
+        }
+        public ShopContext(IConfiguration configuration)
 		{
 			_configuration = configuration;
 			Database.EnsureCreated();
@@ -40,9 +45,8 @@ namespace SomeShop
 
 		protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 		{
-			optionsBuilder.UseInMemoryDatabase("InMemory");
-			//optionsBuilder.UseNpgsql("Host=localhost;Port=5433;Database=SomeShop;Username=postgres;Password=12345qwerty");
-			//base.OnConfiguring(optionsBuilder);
+			//optionsBuilder.UseInMemoryDatabase("InMemory");
+			optionsBuilder.UseNpgsql("Host=localhost;Port=5432;Database=SomeShop;Username=postgres;Password=admin");
 		}
 
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
