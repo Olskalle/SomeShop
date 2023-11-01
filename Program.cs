@@ -17,7 +17,6 @@ namespace SomeShop
 			// Add services to the container.
 			builder.Services.AddScoped<IShopContext, ShopContext>();
 			builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
-
 			builder.Services.Scan(scan => 
 				scan.FromCallingAssembly()
 				.AddClasses()
