@@ -20,95 +20,96 @@ namespace SomeShop.Repositories
 
 		public async Task CreateAsync(TEntity entity, CancellationToken cancellationToken)
 		{
-			_logger.LogInformation("CREATE {0} OF TYPE {1}", entity, typeof(TEntity));
 
 			cancellationToken.ThrowIfCancellationRequested();
 
 			await entitySet.AddAsync(entity);
 			await _context.SaveChangesAsync();
+			_logger.LogInformation("CREATE {0} OF TYPE {1}", entity, typeof(TEntity));
 		}
 
 		public async Task<IQueryable<TEntity>> GetAsync(CancellationToken cancellationToken)
 		{
-			_logger.LogInformation("GET ITEMS OF TYPE {0}", typeof(TEntity));
 
 			cancellationToken.ThrowIfCancellationRequested();
 
-			return await Task.Run( () => 
+			var result = await Task.Run( () => 
 				entitySet
 					.AsNoTracking()
 					.AsQueryable()
 			);
+			_logger.LogInformation("GET ITEMS OF TYPE {0}", typeof(TEntity));
+			return result;
 		}
 
 		public async Task<IQueryable<TEntity>> GetAsync(Expression<Func<TEntity, bool>> func, CancellationToken cancellationToken)
 		{
-			_logger.LogInformation("GET ITEMS OF TYPE {0} WHERE {1}", typeof(TEntity), func.Body);
 
 			cancellationToken.ThrowIfCancellationRequested();
 
-			return await Task.Run(() =>
+			var result = await Task.Run(() =>
 				entitySet
 					.AsNoTracking()
 					.Where(func)
 					.AsQueryable()
 			);
+			_logger.LogInformation("GET ITEMS OF TYPE {0} WHERE {1}", typeof(TEntity), func.Body);
+			return result;
 		}
 
 		public async Task UpdateAsync(TEntity entity, CancellationToken cancellationToken)
 		{
-			_logger.LogInformation("UPDATE {0} OF TYPE {1}", entity, typeof(TEntity));
 			cancellationToken.ThrowIfCancellationRequested();
 
 			entitySet.Update(entity);
 			await _context.SaveChangesAsync();
+			_logger.LogInformation("UPDATE {0} OF TYPE {1}", entity, typeof(TEntity));
 		}
 
 		public async Task RemoveAsync(TEntity entity, CancellationToken cancellationToken)
 		{
-			_logger.LogInformation("REMOVE {0} OF TYPE {1}", entity, typeof(TEntity));
 			cancellationToken.ThrowIfCancellationRequested();
 
 			entitySet.Remove(entity);
 			await _context.SaveChangesAsync();
+			_logger.LogInformation("REMOVE {0} OF TYPE {1}", entity, typeof(TEntity));
 		}
 
 		public async Task DeleteAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken cancellationToken)
 		{
-			_logger.LogInformation("DELETE ITEMS OF TYPE {0} WHERE {1}", typeof(TEntity), predicate.Body);
 
 			cancellationToken.ThrowIfCancellationRequested();
 
-			// FIX:  The provider for the source 'IQueryable' doesn't implement 'IAsyncQueryProvider'.
-			//		 Only providers that implement 'IAsyncQueryProvider' can be used
-			//		 for Entity Framework asynchronous operations.
-			//		 # InMemory storage does not imply ExecuteUpdate and ExecuteDelete
-
+			// InMemory storage does not imply ExecuteUpdate and ExecuteDelete
 			await entitySet.Where(predicate)
 				.ExecuteDeleteAsync(cancellationToken);
 			await _context.SaveChangesAsync();
+
+			_logger.LogInformation("DELETE ITEMS OF TYPE {0} WHERE {1}", typeof(TEntity), predicate.Body);
 		}
 
 		public async Task<IQueryable<TEntity>> GetWithIncludeAsync(CancellationToken cancellationToken, 
 			params Expression<Func<TEntity, object>>[] includeExpressions)
 		{
-			_logger.LogInformation("GET ITEMS OF TYPE {0} INCLUDE {1}", typeof(TEntity), includeExpressions);
 
 			cancellationToken.ThrowIfCancellationRequested();
 
-			return await IncludeAsync(includeExpressions);
+			var result = await IncludeAsync(includeExpressions);
+			_logger.LogInformation("GET ITEMS OF TYPE {0} INCLUDE {1}", typeof(TEntity), includeExpressions);
+			return result;
 		}
 
 		public async Task<IQueryable<TEntity>> GetWithIncludeAsync(CancellationToken cancellationToken, Expression<Func<TEntity, bool>> predicate,
 			params Expression<Func<TEntity, object>>[] includeProperties)
 		{
-			_logger.LogInformation("GET ITEMS OF TYPE {0} WHERE {1} INCLUDE {2}", typeof(TEntity), predicate.Body, includeProperties);
 
 			cancellationToken.ThrowIfCancellationRequested();
 
 			var query = await IncludeAsync(includeProperties);
-			return query.Where(predicate)
+			var result = query.Where(predicate)
 				.AsQueryable();
+			_logger.LogInformation("GET ITEMS OF TYPE {0} WHERE {1} INCLUDE {2}", typeof(TEntity), predicate.Body, includeProperties);
+			return result;
 		}
 
 		private async Task<IQueryable<TEntity>> IncludeAsync(params Expression<Func<TEntity, object>>[] includeExpressions)

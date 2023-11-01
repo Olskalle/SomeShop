@@ -19,8 +19,6 @@ namespace SomeShop.Controllers
 		[HttpGet("all")]
 		public async Task<IActionResult> GetAllOrders(CancellationToken cancellationToken)
 		{
-			throw new OperationCanceledException();
-
 			var result = await _service.GetOrdersAsync(cancellationToken);
 
 			if (result is null || result.Count() <= 0)
