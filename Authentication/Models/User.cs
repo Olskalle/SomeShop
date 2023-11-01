@@ -7,5 +7,11 @@
 		public string Password { get; set; } = null!;
 		public string Email { get; set; } = null!;
 		public bool IsEmailConfirmed { get; set; } = false;
+		public Role Role { get; set; } = Role.Client;
+
+		public override string ToString()
+		{
+			return $"{{ {Id}, {Email} }}";
+		}
 	}
 }
