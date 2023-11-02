@@ -23,8 +23,8 @@ namespace SomeShop.Repositories
 
 			cancellationToken.ThrowIfCancellationRequested();
 
-			await entitySet.AddAsync(entity);
-			await _context.SaveChangesAsync();
+			await entitySet.AddAsync(entity, cancellationToken);
+			await _context.SaveChangesAsync(cancellationToken);
 			_logger.LogInformation("CREATE {0} OF TYPE {1}", entity, typeof(TEntity));
 		}
 
@@ -33,28 +33,24 @@ namespace SomeShop.Repositories
 
 			cancellationToken.ThrowIfCancellationRequested();
 
-			var result = await Task.Run( () => 
-				entitySet
+			var result = entitySet
 					.AsNoTracking()
-					.AsQueryable()
-			);
+					.AsQueryable();
 			_logger.LogInformation("GET ITEMS OF TYPE {0}", typeof(TEntity));
-			return result;
+			return await Task.FromResult(result);
 		}
 
 		public async Task<IQueryable<TEntity>> GetAsync(Expression<Func<TEntity, bool>> func, CancellationToken cancellationToken)
 		{
 
 			cancellationToken.ThrowIfCancellationRequested();
-
-			var result = await Task.Run(() =>
-				entitySet
-					.AsNoTracking()
-					.Where(func)
-					.AsQueryable()
-			);
+			
+			var result = entitySet
+				.AsNoTracking()
+				.Where(func)
+				.AsQueryable();
 			_logger.LogInformation("GET ITEMS OF TYPE {0} WHERE {1}", typeof(TEntity), func.Body);
-			return result;
+			return await Task.FromResult(result);
 		}
 
 		public async Task UpdateAsync(TEntity entity, CancellationToken cancellationToken)
@@ -62,7 +58,7 @@ namespace SomeShop.Repositories
 			cancellationToken.ThrowIfCancellationRequested();
 
 			entitySet.Update(entity);
-			await _context.SaveChangesAsync();
+			await _context.SaveChangesAsync(cancellationToken);
 			_logger.LogInformation("UPDATE {0} OF TYPE {1}", entity, typeof(TEntity));
 		}
 
@@ -71,7 +67,7 @@ namespace SomeShop.Repositories
 			cancellationToken.ThrowIfCancellationRequested();
 
 			entitySet.Remove(entity);
-			await _context.SaveChangesAsync();
+			await _context.SaveChangesAsync(cancellationToken);
 			_logger.LogInformation("REMOVE {0} OF TYPE {1}", entity, typeof(TEntity));
 		}
 
@@ -83,7 +79,7 @@ namespace SomeShop.Repositories
 			// InMemory storage does not imply ExecuteUpdate and ExecuteDelete
 			await entitySet.Where(predicate)
 				.ExecuteDeleteAsync(cancellationToken);
-			await _context.SaveChangesAsync();
+			await _context.SaveChangesAsync(cancellationToken);
 
 			_logger.LogInformation("DELETE ITEMS OF TYPE {0} WHERE {1}", typeof(TEntity), predicate.Body);
 		}
@@ -94,7 +90,7 @@ namespace SomeShop.Repositories
 
 			cancellationToken.ThrowIfCancellationRequested();
 
-			var result = await IncludeAsync(includeExpressions);
+			var result = await IncludeAsync(cancellationToken, includeExpressions);
 			_logger.LogInformation("GET ITEMS OF TYPE {0} INCLUDE {1}", typeof(TEntity), includeExpressions);
 			return result;
 		}
@@ -105,19 +101,23 @@ namespace SomeShop.Repositories
 
 			cancellationToken.ThrowIfCancellationRequested();
 
-			var query = await IncludeAsync(includeProperties);
+			var query = await IncludeAsync(cancellationToken, includeProperties);
 			var result = query.Where(predicate)
 				.AsQueryable();
 			_logger.LogInformation("GET ITEMS OF TYPE {0} WHERE {1} INCLUDE {2}", typeof(TEntity), predicate.Body, includeProperties);
 			return result;
 		}
 
-		private async Task<IQueryable<TEntity>> IncludeAsync(params Expression<Func<TEntity, object>>[] includeExpressions)
+		private async Task<IQueryable<TEntity>> IncludeAsync(CancellationToken cancellationToken, 
+			params Expression<Func<TEntity, object>>[] includeExpressions)
 		{
+			cancellationToken.ThrowIfCancellationRequested();
+
 			IQueryable<TEntity> query = entitySet.AsNoTracking();
-			return await Task.Run(() => includeExpressions
+			var result = includeExpressions
 				.Aggregate(query,
-					(current, includeProperty) => current.Include(includeProperty)));
+					(current, includeProperty) => current.Include(includeProperty));
+			return await Task.FromResult(result);
 		}
 	}
 }

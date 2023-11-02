@@ -35,11 +35,6 @@ namespace SomeShop
 		public DbSet<PaymentProvider> PaymentProviders { get; set; }
 		public DbSet<PaymentStatus> PaymentStatuses { get; set; }
 
-		public async Task<int> SaveChangesAsync()
-		{
-			return await base.SaveChangesAsync();
-		}
-
 		protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 		{
 			//optionsBuilder.UseInMemoryDatabase("InMemory");
@@ -60,9 +55,7 @@ namespace SomeShop
 			{
 				c.HasKey(x => new { x.SessionId, x.ProductId });
 				c.Property(x => x.SessionId).IsRequired();
-				//c.Property(x => x.ShoppingSession).IsRequired();
 				c.Property(x => x.ProductId).IsRequired();
-				//c.Property(x => x.Product).IsRequired();
 			});
 			modelBuilder.Entity<CartItem>()
 				.ToTable(t => t.HasCheckConstraint("Quantity", "Quantity >= 1"));
@@ -89,7 +82,6 @@ namespace SomeShop
 				e.HasKey(x => x.Id);
 				e.Property(x => x.Id).ValueGeneratedOnAdd();
 				e.Property(x => x.Name).IsRequired();
-				//e.Property(x => x.Shop).IsRequired();
 				e.Property(x => x.ShopId).IsRequired();
 				e.Property(x => x.PhoneNumber).HasMaxLength(15);
 			});
@@ -107,22 +99,16 @@ namespace SomeShop
 			{
 				o.HasKey(x => x.Id);
 				o.Property(x => x.Id).ValueGeneratedOnAdd();
-
-				//o.Property(x => x.Client).IsRequired();
+				
 				o.Property(x => x.ClientId).IsRequired();
-				//o.Property(x => x.OrderItems).IsRequired();
 				o.Property(x => x.CreationDate).IsRequired();
-				//o.Property(x => x.Shop).IsRequired();
 				o.Property(x => x.ShopId).IsRequired();
-				//o.Property(x => x.Status).IsRequired();
 			});
 
 			modelBuilder.Entity<OrderItem>(i =>
 			{
 				i.HasKey(x => new { x.OrderId, x.ProductId });
-				//i.Property(x => x.Order).IsRequired();
 				i.Property(x => x.OrderId).IsRequired();
-				//i.Property(x => x.Product).IsRequired();
 				i.Property(x => x.ProductId).IsRequired();
 			});
 			modelBuilder.Entity<OrderItem>()
@@ -139,11 +125,8 @@ namespace SomeShop
 			{
 				p.HasKey(x => x.OrderId);
 				p.Property(x => x.OrderId).IsRequired();
-				//p.Property(x => x.Order).IsRequired();
 				p.Property(x => x.ProviderId).IsRequired();
-				//p.Property(x => x.Provider).IsRequired();
 				p.Property(x => x.StatusId).IsRequired();
-				//p.Property(x => x.Status).IsRequired();
 			});
 
 			modelBuilder.Entity<PaymentProvider>(p =>
@@ -165,9 +148,7 @@ namespace SomeShop
 				p.HasKey(x => x.Id);
 				p.Property(x => x.Id).ValueGeneratedOnAdd();
 				p.Property(x => x.Name).IsRequired();
-				//p.Property(x => x.Categories).IsRequired();
 				p.Property(x => x.ManufacturerId).IsRequired();
-				//p.Property(x => x.Manufacturer).IsRequired();
 			});
 
 			modelBuilder.Entity<Shop>(s =>
@@ -183,18 +164,14 @@ namespace SomeShop
 			{
 				s.HasKey(x => x.Id);
 				s.Property(x => x.Id).ValueGeneratedOnAdd();
-				//s.Property(x => x.Products).IsRequired();
 				s.Property(x => x.ClientId).IsRequired();
-				//s.Property(x => x.Client).IsRequired();
 			});
 
 			modelBuilder.Entity<ShopStorage>(s =>
 			{
 				s.HasKey(x => new { x.ShopId, x.ProductId });
 				s.Property(x => x.ShopId).IsRequired();
-				//s.Property(x => x.Shop).IsRequired();
 				s.Property(x => x.ProductId).IsRequired();
-				//s.Property(x => x.Product).IsRequired();
 			});
 			modelBuilder.Entity<ShopStorage>()
 				.ToTable(t => t.HasCheckConstraint("Quantity", "Quantity >= 0"));
