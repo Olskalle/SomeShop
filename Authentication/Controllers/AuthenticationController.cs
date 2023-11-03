@@ -21,40 +21,52 @@ namespace SomeShop.Authentication.Controllers
         }
 
 		[HttpPost("register")]
-		public async Task<IActionResult> Register(User user, CancellationToken cancellationToken)
+		public async Task<IActionResult> Register(RegisterModel model, CancellationToken cancellationToken)
 		{
-			await _service.AddUserAsync(user, cancellationToken);
+			var user = await _service.GetUserByEmailAsync(model.Email, cancellationToken);
+			if (user is not null) return BadRequest("User with this E-mail already exists");
+
+			var newUser = new User() 
+			{ 
+				UserName = model.Name, 
+				Email = model.Email 
+			};
+
+			await _service.AddUserAsync(newUser, model.Password, cancellationToken);
 			return Ok();
 		}
 
 		[HttpPost("login/email")]
-		public async Task<IActionResult> LoginByEmail(string email, string password, CancellationToken cancellationToken)
+		public async Task<IActionResult> LoginByEmail(LoginModel model, CancellationToken cancellationToken)
 		{
-			var existingUser = await _service.GetUserByEmailAsync(email, cancellationToken);
+			var existingUser = await _service.GetUserByEmailAsync(model.Email, cancellationToken);
 
-			if (existingUser == null || existingUser.Password != password)
+			if (existingUser == null)
 			{
 				return BadRequest("Invalid login data");
 			}
+
+			var isPasswordCorrect = await _service.ValidateUserPassword(existingUser, model.Password);
+			if (!isPasswordCorrect) return BadRequest("Invalid login data");
 
 			var token = _service.GenerateToken(existingUser);
 
 			return Ok(token);
 		}
-		[HttpPost("login")]
-		public async Task<IActionResult> Login(string login, string password, CancellationToken cancellationToken)
-		{
-			var existingUser = await _service.GetUserByLoginAsync(login, cancellationToken);
+		//[HttpPost("login")]
+		//public async Task<IActionResult> Login(string login, string password, CancellationToken cancellationToken)
+		//{
+		//	var existingUser = await _service.GetUserByLoginAsync(login, cancellationToken);
 
-			if (existingUser == null || existingUser.Password != password)
-			{
-				return BadRequest("Invalid login data");
-			}
+		//	if (existingUser == null || existingUser.Password != password)
+		//	{
+		//		return BadRequest("Invalid login data");
+		//	}
 
-			var token = _service.GenerateToken(existingUser);
+		//	var token = _service.GenerateToken(existingUser);
 
-			return Ok(token);
-		}
+		//	return Ok(token);
+		//}
 
 		[HttpGet("test"), Authorize]
 		public IActionResult Test()

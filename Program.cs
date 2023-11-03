@@ -1,7 +1,10 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.HttpLogging;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using SomeShop.Authentication;
+using SomeShop.Authentication.Models;
 using SomeShop.Middleware;
 using SomeShop.Models;
 using SomeShop.Repositories;
@@ -19,6 +22,7 @@ namespace SomeShop
 			var builder = WebApplication.CreateBuilder(args);
 
 			// Add services to the container.
+			builder.Services.AddDbContext<AuthenticationContext>();
 			builder.Services.AddScoped<IShopContext, ShopContext>();
 			builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 			builder.Services.Scan(scan => 
@@ -28,6 +32,8 @@ namespace SomeShop
 				.WithScopedLifetime()
 			);
 
+			builder.Services.AddIdentity<User, IdentityRole>()
+				.AddEntityFrameworkStores<AuthenticationContext>();
 
 			builder.Services.AddControllers()
 				.AddJsonOptions(options =>

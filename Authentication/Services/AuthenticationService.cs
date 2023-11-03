@@ -1,6 +1,6 @@
-﻿using Microsoft.IdentityModel.Tokens;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.IdentityModel.Tokens;
 using SomeShop.Authentication.Models;
-using SomeShop.Authentication.Repositories;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -10,14 +10,17 @@ namespace SomeShop.Authentication.Services
 	public class AuthenticationService : IAuthenticationService
 	{
 		private readonly IConfiguration _configuration;
-		private readonly IUserRepository _repository;
+		private readonly UserManager<User> _userManager;
+		//private readonly RoleManager<User> _roleManager;
 		private readonly ILogger<AuthenticationService>? _logger;
 
-        public AuthenticationService(IConfiguration configuration, 
-			IUserRepository repository, 
+        public AuthenticationService(IConfiguration configuration,
+			UserManager<User> userManager, 
+			//RoleManager<User> roleManager, 
 			ILogger<AuthenticationService>? logger)
         {
-			_repository = repository;
+			_userManager = userManager;
+			//_roleManager = roleManager;
 			_logger = logger;
 			_configuration = configuration;
         }
@@ -27,7 +30,13 @@ namespace SomeShop.Authentication.Services
 			var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:SecretKey"]!));
 			var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
-			var claims = new List<Claim> { new Claim(ClaimTypes.Name, user.Login) };
+			var claims = new List<Claim> 
+			{
+				new Claim("Id", user.Id),
+				new Claim(JwtRegisteredClaimNames.Sub, user.Email),
+				new Claim(JwtRegisteredClaimNames.Email, user.Email),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+			};
 
 			var token = new JwtSecurityToken(
 				_configuration["Jwt:Issuer"],
@@ -40,11 +49,11 @@ namespace SomeShop.Authentication.Services
 			return new JwtSecurityTokenHandler().WriteToken(token);
 		}
 
-		public async Task AddUserAsync(User user, CancellationToken cancellationToken)
+		public async Task AddUserAsync(User user, string password, CancellationToken cancellationToken)
 		{
 			cancellationToken.ThrowIfCancellationRequested();
 
-			await _repository.AddUserAsync(user, cancellationToken);
+			await _userManager.CreateAsync(user, password);
 			_logger?.LogInformation("NEW USER ADDED");
 		}
 
@@ -52,26 +61,24 @@ namespace SomeShop.Authentication.Services
 		{
 			cancellationToken.ThrowIfCancellationRequested();
 
-			var result = await _repository.GetUserByEmailAsync(email, cancellationToken);
+			var result = await _userManager.FindByEmailAsync(email);
 			_logger?.LogInformation("GET USER BY EMAIL");
 			return result;
 		}
 
-		public async Task<User> GetUserByLoginAsync(string login, CancellationToken cancellationToken)
+		//public async Task<User> GetUserByLoginAsync(string login, CancellationToken cancellationToken)
+		//{
+		//	cancellationToken.ThrowIfCancellationRequested();
+
+		//	var result = await _userManager.FindByLoginAsync(login);
+		//	_logger?.LogInformation("GET USER BY LOGIN");
+		//	return result;
+		//}
+
+		public async Task<bool> ValidateUserPassword(User user, string password)
 		{
-			cancellationToken.ThrowIfCancellationRequested();
-
-			var result = await _repository.GetUserByLoginAsync(login, cancellationToken);
-			_logger?.LogInformation("GET USER BY LOGIN");
-			return result;
+			var checkResult = await _userManager.CheckPasswordAsync(user, password);
+			return checkResult;
 		}
-	}
-
-	public interface IAuthenticationService
-	{
-		public string GenerateToken(User user);
-		public Task AddUserAsync(User user, CancellationToken cancellationToken);
-		public Task<User> GetUserByEmailAsync(string email, CancellationToken cancellationToken);
-		public Task<User> GetUserByLoginAsync(string login, CancellationToken cancellationToken);
 	}
 }
