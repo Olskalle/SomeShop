@@ -22,18 +22,18 @@ namespace SomeShop.Authentication
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
 			base.OnModelCreating(modelBuilder);
-			//modelBuilder.Entity<User>(u =>
-			//{
-			//	u.HasData(new User()
-			//	{
-			//		Id=1,
-			//		Login = "Olskalle",
-			//		Password = "12345",
-			//		Email = "forwhomthebelltolls@mail.com"
-			//	});
-			//});
+			SeedUsers();
 		}
 
-		
+		private void SeedUsers()
+		{
+			var admin = new User()
+			{
+				UserName = "5uper4dmin",
+				Email = "admin@supe.ru",
+				EmailConfirmed = true
+			};
+			this.Users.Add(admin);
+		}
 	}
 }

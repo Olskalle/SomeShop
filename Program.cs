@@ -25,14 +25,21 @@ namespace SomeShop
 			builder.Services.AddDbContext<AuthenticationContext>();
 			builder.Services.AddScoped<IShopContext, ShopContext>();
 			builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
-			builder.Services.Scan(scan => 
+			builder.Services.Scan(scan =>
 				scan.FromCallingAssembly()
 				.AddClasses()
 				.AsMatchingInterface()
 				.WithScopedLifetime()
 			);
 
-			builder.Services.AddIdentity<User, IdentityRole>()
+			builder.Services.AddIdentity<User, IdentityRole>(options =>
+			{
+				options.Password.RequireDigit = false;
+				options.Password.RequiredLength = 4;
+				options.Password.RequireNonAlphanumeric = false;
+				options.Password.RequireUppercase = false;
+				options.Password.RequireLowercase = false;
+			})
 				.AddEntityFrameworkStores<AuthenticationContext>();
 
 			builder.Services.AddControllers()
@@ -40,6 +47,7 @@ namespace SomeShop
 				{
 					options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
 				});
+
 			// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 			builder.Services.AddEndpointsApiExplorer();
 			builder.Services.AddSwaggerGen(x =>
@@ -69,8 +77,11 @@ namespace SomeShop
 				});
 			});
 
-			builder.Services.AddAuthorization();
-			builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+			builder.Services.AddAuthentication(options =>
+			{
+				options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+				options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+			})
 				.AddJwtBearer(options =>
 				{
 					options.TokenValidationParameters = new TokenValidationParameters
@@ -84,6 +95,7 @@ namespace SomeShop
 						IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(builder.Configuration["Jwt:SecretKey"]))
 					};
 				});
+			builder.Services.AddAuthorization();
 
 			builder.Services.AddHttpLogging( options =>
 			{

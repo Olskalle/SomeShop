@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using SomeShop.Authentication.Models;
 using SomeShop.Authentication.Services;
@@ -12,18 +13,22 @@ namespace SomeShop.Authentication.Controllers
 	public class AuthenticationController : ControllerBase
 	{
 		private readonly IAuthenticationService _service;
+		private readonly UserManager<User> _userManager;
 		private readonly ILogger<AuthenticationController> _logger;
 
-        public AuthenticationController(IAuthenticationService service, ILogger<AuthenticationController> logger)
+        public AuthenticationController(IAuthenticationService service, 
+			UserManager<User> userManager,
+			ILogger<AuthenticationController> logger)
         {
 			_service = service;
+			_userManager = userManager;
 			_logger = logger;
         }
 
 		[HttpPost("register")]
 		public async Task<IActionResult> Register(RegisterModel model, CancellationToken cancellationToken)
 		{
-			var user = await _service.GetUserByEmailAsync(model.Email, cancellationToken);
+			var user = await _userManager.FindByEmailAsync(model.Email);
 			if (user is not null) return BadRequest("User with this E-mail already exists");
 
 			var newUser = new User() 
@@ -32,24 +37,25 @@ namespace SomeShop.Authentication.Controllers
 				Email = model.Email 
 			};
 
-			await _service.AddUserAsync(newUser, model.Password, cancellationToken);
+			var result = await _userManager.CreateAsync(newUser, model.Password);
+			//if (result?.Errors.Any()) 
 			return Ok();
 		}
 
 		[HttpPost("login/email")]
 		public async Task<IActionResult> LoginByEmail(LoginModel model, CancellationToken cancellationToken)
 		{
-			var existingUser = await _service.GetUserByEmailAsync(model.Email, cancellationToken);
+			var existingUser = await _userManager.FindByEmailAsync(model.Email);
 
 			if (existingUser == null)
 			{
 				return BadRequest("Invalid login data");
 			}
 
-			var isPasswordCorrect = await _service.ValidateUserPassword(existingUser, model.Password);
+			var isPasswordCorrect = await _userManager.CheckPasswordAsync(existingUser, model.Password);
 			if (!isPasswordCorrect) return BadRequest("Invalid login data");
 
-			var token = _service.GenerateToken(existingUser);
+			var token = await _service.GenerateToken(existingUser, cancellationToken);
 
 			return Ok(token);
 		}
@@ -69,9 +75,9 @@ namespace SomeShop.Authentication.Controllers
 		//}
 
 		[HttpGet("test"), Authorize]
-		public IActionResult Test()
+		public async Task<IActionResult> Test()
 		{
-			return Ok();
+			return await Task.FromResult(Ok());
 		}
 	}
 }
