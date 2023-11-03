@@ -14,6 +14,8 @@ namespace SomeShop.Authentication
 			Database.EnsureCreated();
 		}
 
+		public DbSet<RefreshToken> RefreshTokens { get; set; }
+
 		protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 		{
 			optionsBuilder.UseInMemoryDatabase("InMemory");
@@ -22,18 +24,12 @@ namespace SomeShop.Authentication
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
 			base.OnModelCreating(modelBuilder);
-			SeedUsers();
-		}
-
-		private void SeedUsers()
-		{
-			var admin = new User()
+			modelBuilder.Entity<RefreshToken>(t =>
 			{
-				UserName = "5uper4dmin",
-				Email = "admin@supe.ru",
-				EmailConfirmed = true
-			};
-			this.Users.Add(admin);
+				t.Property("UserId").IsRequired();
+				t.Property("Token").IsRequired();
+				t.Property("JwtId").IsRequired();
+			});
 		}
 	}
 }

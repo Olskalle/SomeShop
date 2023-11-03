@@ -32,6 +32,18 @@ namespace SomeShop
 				.WithScopedLifetime()
 			);
 
+			var tokenValidationParameters = new TokenValidationParameters
+			{
+				ValidateIssuer = true,
+				ValidateAudience = true,
+				ValidateLifetime = true,
+				ValidateIssuerSigningKey = true,
+				ValidIssuer = builder.Configuration["Jwt:Issuer"],
+				ValidAudience = builder.Configuration["Jwt:Audience"],
+				IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(builder.Configuration["Jwt:SecretKey"]))
+			};
+			builder.Services.AddSingleton(tokenValidationParameters);
+
 			builder.Services.AddIdentity<User, IdentityRole>(options =>
 			{
 				options.Password.RequireDigit = false;
@@ -84,16 +96,7 @@ namespace SomeShop
 			})
 				.AddJwtBearer(options =>
 				{
-					options.TokenValidationParameters = new TokenValidationParameters
-					{
-						ValidateIssuer = true,
-						ValidateAudience = true,
-						ValidateLifetime = true,
-						ValidateIssuerSigningKey = true,
-						ValidIssuer = builder.Configuration["Jwt:Issuer"],
-						ValidAudience = builder.Configuration["Jwt:Audience"],
-						IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(builder.Configuration["Jwt:SecretKey"]))
-					};
+					options.TokenValidationParameters = tokenValidationParameters;
 				});
 			builder.Services.AddAuthorization();
 

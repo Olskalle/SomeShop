@@ -3,12 +3,13 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using SomeShop.Authentication.Models;
+using SomeShop.Authentication.Models.Dto;
 using SomeShop.Authentication.Services;
 using System.IdentityModel.Tokens.Jwt;
 
 namespace SomeShop.Authentication.Controllers
 {
-	[Route("api/[controller]")]
+    [Route("api/[controller]")]
 	[ApiController]
 	public class AuthenticationController : ControllerBase
 	{
@@ -38,7 +39,11 @@ namespace SomeShop.Authentication.Controllers
 			};
 
 			var result = await _userManager.CreateAsync(newUser, model.Password);
-			//if (result?.Errors.Any()) 
+
+			if (result is null || !result.Succeeded) return BadRequest("User was not created");
+
+			
+
 			return Ok();
 		}
 
@@ -55,24 +60,26 @@ namespace SomeShop.Authentication.Controllers
 			var isPasswordCorrect = await _userManager.CheckPasswordAsync(existingUser, model.Password);
 			if (!isPasswordCorrect) return BadRequest("Invalid login data");
 
-			var token = await _service.GenerateToken(existingUser, cancellationToken);
+			var result = await _service.GenerateToken(existingUser, cancellationToken);
 
-			return Ok(token);
+			return Ok(result);
 		}
-		//[HttpPost("login")]
-		//public async Task<IActionResult> Login(string login, string password, CancellationToken cancellationToken)
-		//{
-		//	var existingUser = await _service.GetUserByLoginAsync(login, cancellationToken);
+		[HttpPost("refresh")]
+		public async Task<IActionResult> RefreshToken(RefreshTokenModel model, CancellationToken cancellationToken)
+		{
+			var result = await _service.VerifyToken(model, cancellationToken);
 
-		//	if (existingUser == null || existingUser.Password != password)
-		//	{
-		//		return BadRequest("Invalid login data");
-		//	}
+			if (result is null)
+			{
+				return BadRequest("Invalid token");
+			}
+			if (result.Errors.Any())
+			{
+				return BadRequest(result.Errors);
+			}
 
-		//	var token = _service.GenerateToken(existingUser);
-
-		//	return Ok(token);
-		//}
+			return Ok(result);
+		}
 
 		[HttpGet("test"), Authorize]
 		public async Task<IActionResult> Test()
